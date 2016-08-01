@@ -100,39 +100,24 @@ class RepayType(models.Model):
 
 
 class User(models.Model):
-    phoneno = models.CharField(db_column='phoneNo', unique=True, max_length=11, blank=True, null=True)  # Field name made lowercase.
+    user_name = models.CharField(unique=True, max_length=32, blank=True, null=True)
     password = models.CharField(max_length=32, blank=True, null=True)
     status = models.CharField(max_length=1, blank=True, null=True)
     is_active = models.IntegerField(blank=True, null=True)
     is_admin = models.IntegerField(blank=True, null=True)
     is_delete = models.IntegerField(blank=True, null=True)
-    gmtlastaccess = models.DateTimeField(db_column='gmtLastAccess', blank=True, null=True)  # Field name made lowercase.
-    nickname = models.CharField(db_column='nickName', max_length=20, blank=True, null=True)  # Field name made lowercase.
+    nick_name = models.CharField(max_length=20, blank=True, null=True)
     role = models.CharField(max_length=8)
     avatar = models.CharField(max_length=128, blank=True, null=True)
     introduction = models.CharField(max_length=128, blank=True, null=True)
-    questionnairenum = models.IntegerField(db_column='questionnaireNum', blank=True, null=True)  # Field name made lowercase.
     sex = models.IntegerField(blank=True, null=True)
     birthday = models.CharField(max_length=10, blank=True, null=True)
     alipay = models.CharField(max_length=32, blank=True, null=True)
     name = models.CharField(max_length=8, blank=True, null=True)
-    idno = models.CharField(db_column='idNo', max_length=18, blank=True, null=True)  # Field name made lowercase.
-    idpicface = models.CharField(db_column='idPicFace', max_length=64, blank=True, null=True)  # Field name made lowercase.
-    idpicback = models.CharField(db_column='idPicBack', max_length=64, blank=True, null=True)  # Field name made lowercase.
-    gmtcreate = models.DateTimeField(db_column='gmtCreate', blank=True, null=True)  # Field name made lowercase.
-    gmtupdate = models.DateTimeField(db_column='gmtUpdate', blank=True, null=True)  # Field name made lowercase.
-    last_login = models.DateTimeField(blank=True, null=True)
     email = models.CharField(max_length=64, blank=True, null=True)
-    missionnum = models.IntegerField(db_column='missionNum', blank=True, null=True)  # Field name made lowercase.
-    is_employee = models.CharField(max_length=1, blank=True, null=True)
-    is_superuser = models.CharField(max_length=1, blank=True, null=True)
-    belongingid = models.IntegerField(db_column='belongingId', blank=True, null=True)  # Field name made lowercase.
-    is_company = models.CharField(max_length=1, blank=True, null=True)
-    directorname = models.CharField(db_column='directorName', max_length=10, blank=True, null=True)  # Field name made lowercase.
-    directorphoneno = models.CharField(db_column='directorPhoneNo', max_length=20, blank=True, null=True)  # Field name made lowercase.
-    companyemail = models.CharField(db_column='companyEmail', max_length=32, blank=True, null=True)  # Field name made lowercase.
-    businesslicenseno = models.CharField(db_column='businessLicenseNo', max_length=32, blank=True, null=True)  # Field name made lowercase.
-    businesslicensepic = models.CharField(db_column='businessLicensePic', max_length=128, blank=True, null=True)  # Field name made lowercase.
+    gmt_login = models.DateTimeField(blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True)
+    gmt_update = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
