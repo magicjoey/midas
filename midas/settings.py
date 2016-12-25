@@ -25,7 +25,7 @@ SECRET_KEY = 'b@&#udc73t!)or(06vg-epnahw99-)jc@%rzhsw(nlvphf!^7q'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -41,6 +41,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rest',
 )
+
+INSTALLED_APPS += ("djcelery", )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -89,6 +91,17 @@ DATABASES = {
 }
 
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.126.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'dragonsmaug@126.com'
+EMAIL_HOST_PASSWORD = 'wq11235813'
+DEFAULT_FROM_EMAIL = '巨龙史矛革<dragonsmaug@126.com>'
+
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -107,3 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+import djcelery
+djcelery.setup_loader()

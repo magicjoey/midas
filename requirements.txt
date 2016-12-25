@@ -2,3 +2,6 @@ Django==1.8.3
 pymysql
 djangorestframework
 django-rest-swagger
+django-celery==3.1.17
+scrapy
+pyquery
