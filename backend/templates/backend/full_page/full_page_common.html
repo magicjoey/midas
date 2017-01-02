@@ -1,0 +1,82 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Meta information -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<!-- Title-->
+<title>{% block title %}Midas{% endblock %}</title>
+<!-- Favicons -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{% static "assets/ico/apple-touch-icon-144-precomposed.png" %}">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="{% static "assets/ico/apple-touch-icon-114-precomposed.png" %}">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="{% static "assets/ico/apple-touch-icon-72-precomposed.png" %}">
+<link rel="apple-touch-icon-precomposed" href="{% static "assets/ico/apple-touch-icon-57-precomposed.png" %}">
+<link rel="shortcut icon" href="{% static "assets/ico/favicon.ico" %}">
+<!-- CSS Stylesheet-->
+<link type="text/css" rel="stylesheet" href="{% static "assets/css/bootstrap/bootstrap.min.css" %}" />
+<link type="text/css" rel="stylesheet" href="{% static "assets/css/bootstrap/bootstrap-themes.css" %}" />
+<link type="text/css" rel="stylesheet" href="{% static "assets/css/style.css" %}" />
+
+<!-- Styleswitch if  you don't chang theme , you can delete -->
+<link type="text/css" rel="alternate stylesheet" media="screen" title="style1" href="{% static "assets/css/styleTheme1.css" %}" />
+<link type="text/css" rel="alternate stylesheet" media="screen" title="style2" href="{% static "assets/css/styleTheme2.css" %}" />
+<link type="text/css" rel="alternate stylesheet" media="screen" title="style3" href="{% static "assets/css/styleTheme3.css" %}" />
+<link type="text/css" rel="alternate stylesheet" media="screen" title="style4" href="{% static "assets/css/styleTheme4.css" %}" />
+    {% block css %}{% endblock %}
+
+</head>
+<body class="full-lg">
+<div id="wrapper">
+
+<div id="loading-top">
+		<div id="canvas_loading"></div>
+		<span>Checking...</span>
+</div>
+
+<div id="main">
+		<div class="container">
+				<div class="row">
+                    {% block content %}{% endblock %}
+				</div>
+				<!-- //row-->
+		</div>
+		<!-- //container-->
+		
+</div>
+<!-- //main-->
+
+		
+</div>
+<!-- //wrapper-->
+
+
+<!--
+////////////////////////////////////////////////////////////////////////
+//////////     JAVASCRIPT  LIBRARY     //////////
+/////////////////////////////////////////////////////////////////////
+-->
+		
+<!-- Jquery Library -->
+<script type="text/javascript" src="{% static "assets/js/jquery.min.js" %}"></script>
+<script type="text/javascript" src="{% static "assets/js/jquery.ui.min.js" %}"></script>
+<script type="text/javascript" src="{% static "assets/plugins/bootstrap/bootstrap.min.js" %}"></script>
+<!-- Modernizr Library For HTML5 And CSS3 -->
+<script type="text/javascript" src="{% static "assets/js/modernizr/modernizr.js" %}"></script>
+<script type="text/javascript" src="{% static "assets/plugins/mmenu/jquery.mmenu.js" %}"></script>
+<script type="text/javascript" src="{% static "assets/js/styleswitch.js" %}"></script>
+<!-- Library 10+ Form plugins-->
+<script type="text/javascript" src="{% static "assets/plugins/form/form.js" %}"></script>
+<!-- Datetime plugins -->
+<script type="text/javascript" src="{% static "assets/plugins/datetime/datetime.js" %}"></script>
+<!-- Library Chart-->
+<script type="text/javascript" src="{% static "assets/plugins/chart/chart.js" %}"></script>
+<!-- Library  5+ plugins for bootstrap -->
+<script type="text/javascript" src="{% static "assets/plugins/pluginsForBS/pluginsForBS.js" %}"></script>
+<!-- Library 10+ miscellaneous plugins -->
+<script type="text/javascript" src="{% static "assets/plugins/miscellaneous/miscellaneous.js" %}"></script>
+<!-- Library Themes Customize-->
+<script type="text/javascript" src="{% static "assets/js/caplet.custom.js" %}"></script>
+{% block js %}{% endblock %}
+</body>
+</html>

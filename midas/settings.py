@@ -39,10 +39,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest',
+    'api',
+    'backend'
 )
 
-INSTALLED_APPS += ("djcelery", )
+# INSTALLED_APPS += ("djcelery", )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -121,6 +122,26 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+SITE_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)),'..')
 
-import djcelery
-djcelery.setup_loader()
+STATIC_ROOT = os.path.join(SITE_ROOT,'static')
+
+STATICFILES_DIRS = (
+    ("css", os.path.join(STATIC_ROOT, 'css')),
+    ("js", os.path.join(STATIC_ROOT, 'js')),
+    ("images", os.path.join(STATIC_ROOT, 'images')),
+    ("img", os.path.join(STATIC_ROOT, 'img')),
+    ("fonts", os.path.join(STATIC_ROOT, 'fonts')),
+    ("plugins", os.path.join(STATIC_ROOT, 'plugins')),
+    ("grappelli", os.path.join(STATIC_ROOT, 'grappelli')),
+    ("file", os.path.join(STATIC_ROOT, 'file')),
+    ("assets", os.path.join(STATIC_ROOT, 'assets')),
+)
+
+TEMPLATE_DIRS = (
+    os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
+)
+
+
+# import djcelery
+# djcelery.setup_loader()
