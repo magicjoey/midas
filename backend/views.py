@@ -1,13 +1,8 @@
-from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.decorators import api_view
-
-
-
-
 
 @api_view(['GET', 'POST'])
 def login(request):
@@ -49,4 +44,41 @@ def register(request):
 
 
 def dashboard(request):
-    return None
+    if check_login(request):
+        login_user = get_login_user(request)
+        return render(request, "backend/nav_page/dashboard.html", {})
+    else:
+        return HttpResponseRedirect("/login?code=S&msg=请登录")
+
+
+def account(request):
+    if check_login(request):
+        login_user = get_login_user(request)
+        return render(request, "backend/nav_page/account.html", {})
+    else:
+        return HttpResponseRedirect("/login?code=S&msg=请登录")
+
+
+def finance(request):
+    return render(request, "backend/nav_page/finance.html", {})
+
+
+def donate(request):
+    # todo 捐赠
+    pass
+
+
+
+def profile(request):
+    return render(request, "backend/nav_page/profile.html", {})
+
+def password(request):
+    return render(request, "backend/nav_page/password.html", {})
+
+
+def check_login(request):
+    return get_login_user(request) is not None
+
+
+def get_login_user(request):
+    return request.session['login_user']

@@ -9,7 +9,7 @@ class Account(models.Model):
     platform_id = models.IntegerField(blank=True, null=True)
     account_type = models.CharField(max_length=10, blank=True, null=True)
     balance = models.FloatField(blank=True, null=True)
-    usuage = models.CharField(max_length=20, blank=True, null=True)
+    usage = models.CharField(max_length=20, blank=True, null=True)
     gmt_start = models.DateField(blank=True, null=True)
     cycle = models.IntegerField(blank=True, null=True)
     gmt_end = models.DateField(blank=True, null=True)
@@ -201,3 +201,52 @@ class User(models.Model):
     class Meta:
         managed = False
         db_table = 'tb_user'
+
+
+class SmsRecord(models.Model):
+    mobile_no = models.CharField(max_length=11, blank=True, null=True)
+    content = models.CharField(max_length=256, blank=True, null=True)
+    verify_code = models.CharField(max_length=12, blank=True, null=True)
+    type = models.CharField(max_length=20, blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tb_sms_record'
+
+
+class SmsTemplate(models.Model):
+    type = models.CharField(primary_key=True, max_length=12)
+    content = models.CharField(max_length=256, blank=True, null=True)
+    gmt_create = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'tb_sms_template'
+
+
+class SmsType(models.Model):
+    type = models.CharField(primary_key=True, max_length=10)
+    name = models.CharField(max_length=20, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tb_sms_type'
+
+
+class Config(models.Model):
+    name = models.CharField(max_length=32, blank=True, null=True)
+    content = models.CharField(max_length=256, blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True)
+    gmt_modified = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tb_config'
+
+
+class RateParam(models.Model):
+    id = models.IntegerField(primary_key=True)
+    half_minute = models.IntegerField()
+    five_minutes = models.IntegerField()
+    one_day = models.IntegerField()

@@ -17,4 +17,5 @@ urlpatterns = [
     url(r'^register/', views.register),
     url(r'^invests/', views.invests),
     url(r'^reminders/', views.reminders),
+    url(r'^sms/', views.sms),
 ]
