@@ -1,16 +1,18 @@
 {% extends "backend/common/nav_common.html" %}
 {% load staticfiles %}
-{% block title %}Midas-个人账户{% endblock %}
+{% block title %}Midas-账务管理{% endblock %}
 {% block css %}{% endblock %}
 {% block content %}
     <div class="col-lg-12">
         <section class="panel">
             <header class="panel-heading">
-                <h2><strong>个人账户</strong></h2>
-                <label class="color">个人账户 <em><strong> </strong></em></label>
+                <h2><strong>账务管理</strong></h2>
+                <label class="color">账务管理 <em><strong> </strong></em></label>
 
-                <button class="pull-right btn btn-success" id="addAccount" type="button">
-                    <i class="glyphicon glyphicon-plus"></i><span>新增账户</span></button>
+                <a href="/accounting/">
+                    <button class="pull-right btn btn-success" type="button">
+                        <i class="glyphicon glyphicon-plus"></i><span> 记账</span></button>
+                </a>
             </header>
             <div class="panel-tools fully color " align="right" data-toolscolor="theme-inverse">
                 <ul class="tooltip-area">
@@ -84,9 +86,9 @@
                     </table>
                 </form>
             </div>
-{#            <div class="panel-body">#}
-{#                无信息#}
-{#            </div>#}
+            {#            <div class="panel-body">#}
+            {#                无信息#}
+            {#            </div>#}
         </section>
 
     </div>

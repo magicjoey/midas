@@ -1,0 +1,113 @@
+{% extends "backend/common/nav_common.html" %}
+{% load staticfiles %}
+{% block title %}Midas-账户图表{% endblock %}
+{% block css %}{% endblock %}
+{% block content %}
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                <h2><strong>账户图表</strong></h2>
+                <label class="color">账户图表 <em><strong> </strong></em></label>
+            </header>
+            <div class="panel-tools fully color " align="right" data-toolscolor="theme-inverse">
+                <ul class="tooltip-area">
+                    <li>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                                    data-toggle="dropdown" data-table="table-toggle-column"
+                                    data-table-target="#toggle-column" title="Table Column"><i
+                                    class="fa fa-th-list"></i></button>
+                            <ul class="dropdown-menu arrow pull-right" role="menu"></ul>
+                        </div>
+                    </li>
+                    <li><a href="javascript:void(0)" class="btn btn-collapse" title="Collapse"><i
+                            class="fa fa-sort-amount-asc"></i></a></li>
+                    <li><a href="javascript:void(0)" class="btn btn-reload" title="Reload"><i
+                            class="fa fa-retweet"></i></a></li>
+                    <li><a href="javascript:void(0)" class="btn btn-close" title="Close"><i
+                            class="fa fa-times"></i></a></li>
+                </ul>
+            </div>
+            <div class="panel-body">
+
+            <section class="panel corner-flip">
+												<header class="panel-heading no-borders">
+														<label class="color"> <strong>平台资金分布 </strong></label>
+												</header>
+														<div class="widget-chart">
+																<div class="label-flot-custom-title"><span>资金分布</span></div>
+																<table id="account_fund_chart" class="flot-chart" data-type="pie" data-inner-radius="0.5" data-pie-style="shadow" data-tool-tip="show" data-width="100%" data-height="420px" >
+																		<thead>
+																				<tr>
+																						<th></th>
+																						{% for account in account_list %}<th>{{ account.platform.platform_name }}</th>{% endfor %}
+																				</tr>
+																		</thead>
+																		<tbody>
+																				<tr>
+																						<th></th>
+																					{% for account in account_list %}<td>{{ account.balance }}</td>{% endfor %}
+																				</tr>
+																		</tbody>
+																</table>
+														</div><!-- // widget-chart -->
+
+												<div class="align-lg-center">
+														<div class="label-flot-custom" data-flot-id="#account_fund_chart"></div>
+												</div>
+
+										</section>
+
+              <section class="panel corner-flip">
+												<header class="panel-heading no-borders">
+														<label class="color"> <strong>产品资金分布 </strong></label>
+												</header>
+														<div class="widget-chart">
+																<div class="label-flot-custom-title"><span>资金分布</span></div>
+																<table id="account_fund_chart" class="flot-chart" data-type="pie" data-inner-radius="0.5" data-pie-style="shadow" data-tool-tip="show" data-width="100%" data-height="420px" >
+																		<thead>
+																				<tr>
+																						<th></th>
+																						{% for account in account_list %}<th>{{ account.platform.platform_name }}</th>{% endfor %}
+																				</tr>
+																		</thead>
+																		<tbody>
+																				<tr>
+																						<th></th>
+																					{% for account in account_list %}<td>{{ account.balance }}</td>{% endfor %}
+																				</tr>
+																		</tbody>
+																</table>
+														</div><!-- // widget-chart -->
+
+												<div class="align-lg-center">
+														<div class="label-flot-custom" data-flot-id="#account_fund_chart"></div>
+												</div>
+
+										</section>
+
+            </div>
+
+            {#  <div class="panel-body">#}
+            {#                无信息#}
+            {#            </div>#}
+        </section>
+
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="{% static "assets/plugins/datable/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/plugins/datable/dataTables.bootstrap.js" %}"></script>
+
+    <script>
+        $("#addAccount").click(function () {
+            $.ajax({
+                url: '/ajax/add_acct/',
+                success: function (e) {
+                    $("body").append(e);
+                }
+            })
+        });
+
+    </script>
+{% endblock %}

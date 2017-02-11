@@ -3,17 +3,21 @@ import json
 import random
 from string import Template
 from django.contrib.auth.hashers import make_password, check_password
+from django.core import serializers
 from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from api.models import Platform, User, SmsRecord, SmsTemplate, Config
+from api.models import Platform, User, SmsRecord, SmsTemplate, Config, AccountType, PlatformProduct, Account, AccountSub
 from api.serialzers import PlatformSerializer, UserSerializer, RegisterSerializer, LoginSerializer, \
-    LoginResponseSerializer, SmsRequestSerializer, SmsTemplateSerializer, ConfigSerializer
+    LoginResponseSerializer, SmsRequestSerializer, SmsTemplateSerializer, ConfigSerializer, AccountSerializer, \
+    AccountTypeSerializer, PlatformProductSerializer, AccountSubSerializer, AccountDepositSerializer
 from api.throttle import SmsRateThrottle
 from api.util import build_response
+import meta
 
 
 @api_view(['POST'])
@@ -23,7 +27,7 @@ def register(request):
     ---
     request_serializer: RegisterSerializer
     """
-    serializer = RegisterSerializer(data=request.data)#, many=True)
+    serializer = RegisterSerializer(data=request.data)  # , many=True)
     if serializer.is_valid():
         try:
             # 校验短信验证码
@@ -116,13 +120,6 @@ def calendar(request, format=None):
     serializer = PlatformSerializer(pts, many=True)
     return Response(serializer.data)
 
-@api_view(['GET', 'POST'])
-def platforms(request, format=None):
-    user_id = request.GET.get("user_id")
-    pts = Platform.objects.filter(owner_type='system')
-    pts_user = Platform.objects.filter(owner_type='user')
-    serializer = PlatformSerializer(pts, many=True)
-    return Response(serializer.data)
 
 @api_view(['GET', 'POST'])
 def platform_add(request, format=None):
@@ -130,11 +127,13 @@ def platform_add(request, format=None):
     serializer = PlatformSerializer(pts, many=True)
     return Response(serializer.data)
 
+
 @api_view(['GET', 'POST'])
 def platform_delete(request, format=None):
     pts = Platform.objects.all()
     serializer = PlatformSerializer(pts, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET', 'POST'])
 def products(request, format=None):
@@ -142,11 +141,13 @@ def products(request, format=None):
     serializer = PlatformSerializer(pts, many=True)
     return Response(serializer.data)
 
+
 @api_view(['GET', 'POST'])
 def product_add(request, format=None):
     pts = Platform.objects.all()
     serializer = PlatformSerializer(pts, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET', 'POST'])
 def product_delete(request, format=None):
@@ -154,13 +155,16 @@ def product_delete(request, format=None):
     serializer = PlatformSerializer(pts, many=True)
     return Response(serializer.data)
 
+
 @api_view(['GET', 'POST'])
 def invest_add(request, format=None):
     pass
 
+
 @api_view(['GET', 'POST'])
 def invest_delete(request, format=None):
     pass
+
 
 @api_view(['GET', 'POST'])
 def invests(request, format=None):
@@ -170,3 +174,114 @@ def invests(request, format=None):
 @api_view(['GET', 'POST'])
 def reminders(request, format=None):
     pass
+
+
+@api_view(['GET', 'POST'])
+def account(request, format=None):
+    """
+    账户更新接口:
+    ---
+    request_serializer: AccountSerializer
+    """
+    param_dict = meta.to_dict(request.data)
+    param_dict['user_id'] = meta.get_user_id(request)
+    serializer = AccountSerializer(data=param_dict)
+    if serializer.is_valid():
+        serializer.save()
+        # if request.data['is_deposit'] == "Y":
+            # account = Account.objects.get(user_id=meta.get_user_id(request), account_type_id=param_dict['account_type'])
+            # param_dict['account_id'] = account.account_id
+            # dp_serializer = AccountDepositSerializer(data=param_dict)
+            # if dp_serializer.is_valid():
+            #     dp_serializer.save()
+            # else:
+            # return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        return Response({"code": "S", "msg": "更新成功"}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST'])
+def account_sub(request, format=None):
+    """
+    子账户更新接口:
+    ---
+    request_serializer: AccountSubSerializer
+    """
+    account = Account.objects.get(user_id=meta.get_user_id(request), account_id=request.data['account_id'])
+    param_dict = meta.to_dict(request.data)
+    param_dict['user_id'] = meta.get_user_id(request)
+    serializer = AccountSubSerializer(data=param_dict)
+    if serializer.is_valid():
+        serializer.save()
+        account.balance += serializer.data['balance']
+        account.save()
+        if request.POST.get('is_deposit') == "Y":
+            account_sub_list = AccountSub.objects.filter(user_id=meta.get_user_id(request), account_id=param_dict['account_id']).order_by("-gmt_create")
+            param_dict['sub_id'] = account_sub_list[0].id
+            dp_serializer = AccountDepositSerializer(data=param_dict)
+            if dp_serializer.is_valid():
+                dp_serializer.save()
+            else:
+                return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        return Response({"code": "S", "msg": "更新成功"}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+def platform(request):
+    """
+    平台更新接口:
+    ---
+    request_serializer: PlatformSerializer
+    """
+    pf_dict = meta.to_dict(request.data)
+    pf_dict['owner_id'] = meta.get_user_id(request)
+    serializer = PlatformSerializer(data=pf_dict)
+    if serializer.is_valid():
+        serializer.save()
+        platform_list = meta.to_json(Platform.objects.filter(owner_id__in=[-1, meta.get_user_id(request)]))
+        return Response({"code": "S", "msg": "更新成功", "platform_list": platform_list}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+def platform_product(request):
+    """
+    平台产品更新接口:
+    ---
+    request_serializer: PlatformSerializer
+    """
+    # pf_dict = meta.to_dict(request.data)
+    # pf_dict['owner_id'] = meta.get_user_id(request)
+    serializer = PlatformProductSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        platform_product_list = meta.to_json(PlatformProduct.objects.filter(platform_id=request.data['platform_id']))
+        return Response({"code": "S", "msg": "更新成功", "platform_product_list": platform_product_list},
+                        status=status.HTTP_200_OK)
+    return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+def acct_type(request):
+    """
+    平台类型新增接口:
+    ---
+    request_serializer: AccountTypeSerializer
+    """
+    if request.method == "POST":
+        serializer = AccountTypeSerializer(data={"name": request.data['name'], "owner_id": meta.get_user_id(request)})
+        if serializer.is_valid():
+            serializer.save()
+            acct_types = meta.to_json(AccountType.objects.filter(owner_id__in=[-1, meta.get_user_id(request)]))
+            return Response({"code": "S", "msg": "更新成功", "account_types": acct_types}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+    elif request.method == "DELETE":
+        id = request.GET['id']
+        try:
+            account_type = AccountType.objects.get(owner_id=meta.get_user_id(request), id=id)
+            account_type.delete()
+        except AccountType.DoesNotExist:
+            return Response({"code": "F", "msg": "删除失败"}, status.HTTP_400_BAD_REQUEST)
+        acct_types = meta.to_json(AccountType.objects.filter(owner_id__in=[-1, meta.get_user_id(request)]))
+        return Response({"code": "S", "msg": "更新成功", "account_types": acct_types}, status=status.HTTP_200_OK)

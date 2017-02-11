@@ -54,6 +54,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'middleware.auth.AuthCheckMiddleware',
 )
 
 ROOT_URLCONF = 'midas.urls'
@@ -136,6 +137,7 @@ STATICFILES_DIRS = (
     ("grappelli", os.path.join(STATIC_ROOT, 'grappelli')),
     ("file", os.path.join(STATIC_ROOT, 'file')),
     ("assets", os.path.join(STATIC_ROOT, 'assets')),
+    ("midas", os.path.join(STATIC_ROOT, 'midas')),
 )
 
 TEMPLATE_DIRS = (

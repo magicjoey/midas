@@ -1,0 +1,78 @@
+{% extends "backend/common/nav_common.html" %}
+{% load staticfiles %}
+{% block title %}Midas-资产增长{% endblock %}
+{% block css %}{% endblock %}
+{% block content %}
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                <h2><strong>资产增长</strong></h2>
+                <label class="color">资产增长 <em><strong> </strong></em></label>
+            </header>
+            <div class="panel-tools fully color " align="right" data-toolscolor="theme-inverse">
+                <ul class="tooltip-area">
+                    <li>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                                    data-toggle="dropdown" data-table="table-toggle-column"
+                                    data-table-target="#toggle-column" title="Table Column"><i
+                                    class="fa fa-th-list"></i></button>
+                            <ul class="dropdown-menu arrow pull-right" role="menu"></ul>
+                        </div>
+                    </li>
+                    <li><a href="javascript:void(0)" class="btn btn-collapse" title="Collapse"><i
+                            class="fa fa-sort-amount-asc"></i></a></li>
+                    <li><a href="javascript:void(0)" class="btn btn-reload" title="Reload"><i
+                            class="fa fa-retweet"></i></a></li>
+                    <li><a href="javascript:void(0)" class="btn btn-close" title="Close"><i
+                            class="fa fa-times"></i></a></li>
+                </ul>
+            </div>
+            <div class="panel-body">
+
+                <section class="panel corner-flip">
+                    <header class="panel-heading no-borders">
+                        <label class="color"><strong>资产增长</strong></label>
+                    </header>
+                    <div class="widget-chart chart-dark">
+                        <table class="flot-chart" data-type="lines" data-tool-tip="show" data-width="100%"
+                               data-height="220px">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th style="color : #f35958;">预期资金</th>
+                                <th style="color : #3db9af;">实际资金</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for sin_data in data_dict %}
+                                <tr>
+                                    <th>{{ sin_data.date }}</th>
+
+                                    <td>{{ sin_data.expect_amount }}</td>
+                                    <td>{{ sin_data.actual_amount }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+
+            </div>
+
+            {#  <div class="panel-body">#}
+            {#                无信息#}
+            {#            </div>#}
+        </section>
+
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="{% static "assets/plugins/datable/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/plugins/datable/dataTables.bootstrap.js" %}"></script>
+
+    <script>
+
+    </script>
+{% endblock %}

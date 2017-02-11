@@ -14,4 +14,7 @@ from backend import ajax_views
 urlpatterns = [
     url(r'add_acct/', ajax_views.add_account),
     url(r'add_acct_type/', ajax_views.add_account_type),
-    ]
+    url(r'add_platform/', ajax_views.add_platform),
+    url(r'add_acct_sub/', ajax_views.add_acct_sub),
+    url(r'add_platform_product/', ajax_views.add_platform_product),
+]

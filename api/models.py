@@ -1,27 +1,5 @@
 from django.db import models
-
-
-class Account(models.Model):
-    account_id = models.IntegerField(primary_key=True)
-    account_name = models.CharField(max_length=32, blank=True, null=True)
-    user_id = models.IntegerField(blank=True, null=True)
-    platform = models.CharField(max_length=20, blank=True, null=True)
-    platform_id = models.IntegerField(blank=True, null=True)
-    account_type = models.CharField(max_length=10, blank=True, null=True)
-    balance = models.FloatField(blank=True, null=True)
-    usage = models.CharField(max_length=20, blank=True, null=True)
-    gmt_start = models.DateField(blank=True, null=True)
-    cycle = models.IntegerField(blank=True, null=True)
-    gmt_end = models.DateField(blank=True, null=True)
-    return_rate = models.FloatField(blank=True, null=True)
-    memo = models.CharField(max_length=100, blank=True, null=True)
-    gmt_create = models.DateTimeField(blank=True, null=True)
-    gmt_modified = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=1, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'tb_account'
+from django.utils import timezone
 
 
 class AccountCard(models.Model):
@@ -58,10 +36,11 @@ class AccountFlow(models.Model):
 
 
 class AccountType(models.Model):
-    id = models.CharField(primary_key=True, max_length=10)
-    name = models.CharField(max_length=32, blank=True, null=True)
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=32, blank=False, null=False)
+    is_deposit = models.CharField(max_length=1, blank=False, null=False)
     owner_id = models.IntegerField(blank=True, null=True)
-    gmt_create = models.DateTimeField(blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
 
     class Meta:
         managed = False
@@ -133,9 +112,9 @@ class Invest(models.Model):
 class Platform(models.Model):
     platform_id = models.AutoField(primary_key=True)
     platform_name = models.CharField(max_length=32, blank=True, null=True)
-    owner_type = models.CharField(max_length=5)
     owner_id = models.IntegerField(blank=True, null=True)
-    gmt_create = models.DateTimeField()
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    memo = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -148,11 +127,81 @@ class PlatformProduct(models.Model):
     product_name = models.CharField(max_length=32, blank=True, null=True)
     repay_type = models.CharField(max_length=10, blank=True, null=True)
     interest_rate = models.FloatField(blank=True, null=True)
-    gmt_create = models.DateTimeField(blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
 
     class Meta:
         managed = False
         db_table = 'tb_platform_product'
+
+
+class Account(models.Model):
+    account_id = models.IntegerField(primary_key=True, blank=True)
+    account_name = models.CharField(max_length=32, blank=True, null=True)
+    user_id = models.IntegerField(blank=False, null=False)
+    platform = models.ForeignKey(Platform, max_length=12, on_delete=models.DO_NOTHING,
+                                 verbose_name="平台",
+                                 db_column="platform", related_name='platform_fk')
+    account_type = models.ForeignKey(AccountType, max_length=12, on_delete=models.DO_NOTHING,
+                                     verbose_name="账户类型",
+                                     db_column="account_type", related_name='account_type_fk')
+    balance = models.FloatField(blank=True, null=True)
+    usage = models.CharField(max_length=20, blank=True, null=True)
+    gmt_start = models.DateField(blank=True, null=True)
+    cycle = models.IntegerField(blank=True, null=True)
+    gmt_end = models.DateField(blank=True, null=True)
+    return_rate = models.FloatField(blank=True, null=True)
+    memo = models.CharField(max_length=100, blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    gmt_modified = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    status = models.CharField(max_length=1, blank=True, null=True, default='N')
+    weight = models.IntegerField(blank=True, null=True, default='0')
+
+    class Meta:
+        managed = False
+        db_table = 'tb_account'
+
+
+class AccountSub(models.Model):
+    id = models.IntegerField(primary_key=True)
+    account_id = models.ForeignKey(Account, max_length=11, on_delete=models.DO_NOTHING,
+                                   verbose_name="主账户",
+                                   db_column="account_id", related_name='account_pk')
+    account_name = models.CharField(max_length=32, blank=True, null=True)
+    user_id = models.IntegerField(blank=True, null=True)
+    product_id = models.IntegerField(blank=True, null=True)
+    memo = models.CharField(max_length=64, blank=True, null=True)
+    balance = models.FloatField(blank=True, null=True)
+    return_rate = models.FloatField(blank=True, null=True)
+    redeem_type = models.CharField(max_length=1, blank=True, null=True)
+    gmt_start = models.DateField(blank=True, null=True)
+    gmt_end = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    gmt_modified = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tb_account_sub'
+
+
+class AccountDeposit(models.Model):
+    account_id = models.ForeignKey(Account, max_length=11, on_delete=models.DO_NOTHING,
+                                   verbose_name="主账户",
+                                   db_column="account_id")
+    user_id = models.IntegerField(blank=True, null=True)
+    sub_id = models.IntegerField(blank=True, null=True)
+    account_type = models.IntegerField(blank=True, null=True)
+    deposit_type = models.CharField(max_length=1, blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    gmt_modified = models.DateTimeField(blank=True, null=True)
+    day = models.CharField(max_length=32, blank=True, null=True)
+    amount = models.FloatField(blank=True, null=True)
+    base = models.FloatField(blank=True, null=True)
+    deposit_rate = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tb_account_deposit'
 
 
 class Reminder(models.Model):

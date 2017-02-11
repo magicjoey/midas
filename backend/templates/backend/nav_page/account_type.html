@@ -1,16 +1,16 @@
 {% extends "backend/common/nav_common.html" %}
 {% load staticfiles %}
-{% block title %}Midas-个人账户{% endblock %}
+{% block title %}Midas-账户类型{% endblock %}
 {% block css %}{% endblock %}
 {% block content %}
     <div class="col-lg-12">
         <section class="panel">
             <header class="panel-heading">
-                <h2><strong>个人账户</strong></h2>
-                <label class="color">个人账户 <em><strong> </strong></em></label>
+                <h2><strong>账户类型</strong></h2>
+                <label class="color">账户类型 <em><strong> </strong></em></label>
 
-                <button class="pull-right btn btn-success" id="addAccount" type="button">
-                    <i class="glyphicon glyphicon-plus"></i><span>新增账户</span></button>
+                <button class="pull-right btn btn-success" id="addAccountType" type="button">
+                    <i class="glyphicon glyphicon-plus"></i><span>新增账户类型</span></button>
             </header>
             <div class="panel-tools fully color " align="right" data-toolscolor="theme-inverse">
                 <ul class="tooltip-area">
@@ -38,44 +38,27 @@
                            id="toggle-column">
                         <thead>
                         <tr>
-                            <th>账户编号</th>
-                            <th>账户名</th>
-                            <th>平台</th>
-                            <th>账户类型</th>
-                            <th>金额(余)</th>
-                            <th>用途</th>
-                            <th>开始</th>
-                            <th>周期(天)</th>
-                            <th>结束</th>
-                            <th>收益率</th>
-                            <th>备注</th>
-                            <th>状态</th>
+                            <th>类型编号</th>
+                            <th>账户类型名</th>
+                            <th>归属</th>
+                            <th>创建时间</th>
                             <th>操作</th>
                         </tr>
                         </thead>
-                        <tbody align="left">
-                        {% for account in account_list %}
+                        <tbody align="center">
+                        {% for account_type in account_type_list %}
                             <tr class="odd gradeX">
-                                <td>{{ account.account_id }}</td>
-                                <td><a href="/account_sub/?account_id={{ account.account_id }}"
-                                       target="_blank">{{ account.account_name }}</a></td>
-                                <td>{{ account.platform.platform_name }}</td>
-                                <td>{{ account.account_type.name }}</td>
-                                <td>¥{{ account.balance }}</td>
-                                <td>{{ account.usage }}</td>
-                                <td>{{ account.gmt_start }}</td>
-                                <td>{{ account.cycle }}</td>
-                                <td>{{ account.gmt_end }}</td>
-                                <td>{{ account.return_rate }}</td>
-                                <td>{{ account.memo }}</td>
-                                <td>{{ account.status.name }}</td>
+                                <td>{{ account_type.id }}</td>
+                                <td>{{ account_type.name }}</td>
+                                <td>{% if account_type.user_id == -1 %}系统{% else %}自己{% endif %} </td>
+                                <td>{{ account_type.gmt_create }}</td>
                                 <td class="center">
-                                    <a href="javascript:ajax_del('<?=$menu->menu_id?>')" class="ajaxDel"
-                                       id="<?=$menu->menu_id?>"><span class="table-button glyphicon glyphicon-trash"
+                                    <a href="javascript:void(0);" class="ajax_del"
+                                       data-src="{{ account_type.id }}"><span class="table-button glyphicon glyphicon-trash"
                                                                       aria-hidden="true"></span></a>
                                     &nbsp;&nbsp;
-                                    <a href="javascript:ajaxEdit('<?=$menu->menu_id?>')" class="ajaxEdit"
-                                       id="<?=$menu->menu_id?>"><span class="table-button glyphicon glyphicon-cog"
+                                    <a href="javascript:void(0);" class="ajax_edit"
+                                       data-src="{{ account_type.id }}"><span class="table-button glyphicon glyphicon-cog"
                                                                       aria-hidden="true"></span></a>
                                 </td>
                             </tr>
@@ -84,9 +67,6 @@
                     </table>
                 </form>
             </div>
-{#            <div class="panel-body">#}
-{#                无信息#}
-{#            </div>#}
         </section>
 
     </div>
@@ -96,13 +76,24 @@
     <script type="text/javascript" src="{% static "assets/plugins/datable/dataTables.bootstrap.js" %}"></script>
 
     <script>
-        $("#addAccount").click(function () {
+        $("#addAccountType").click(function () {
             $.ajax({
-                url: '/ajax/add_acct/',
+                url: '/ajax/add_acct_type/',
                 success: function (e) {
                     $("body").append(e);
                 }
             })
+        });
+        $(".ajax_del").click(function(){
+            if(confirm("确认删除这条记录吗?")){
+                $.ajax({
+                    url: '/api/acct_type?id='+$(this).attr("data-src"),
+                    type: 'delete',
+                    success:function(e){
+                        location.reload();
+                    }
+                })
+            }
         });
     </script>
 {% endblock %}

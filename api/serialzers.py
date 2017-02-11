@@ -10,26 +10,21 @@
 """
 from rest_framework import serializers
 from api import fields
-from api.models import Platform, User, SmsTemplate, Config
+from api.models import Platform, User, SmsTemplate, Config, AccountType, Account, PlatformProduct, AccountSub, \
+    AccountDeposit
 
 
-class PlatformSerializer(serializers.Serializer):
-    pk = serializers.IntegerField(read_only=True)
-    platform_name = serializers.CharField(required=True, allow_blank=False, max_length=32)
-    owner_type = serializers.CharField(max_length=5)
-    owner_id = serializers.IntegerField(allow_null=True)
-    gmt_create = serializers.DateTimeField(allow_null=True)
+class PlatformSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Platform
+        fields = ('platform_name', 'owner_id', 'gmt_create', 'memo')
 
-    def create(self, validated_data):
-        return Platform.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        instance.platform_name = validated_data.get('platform_name', instance.platform_name)
-        instance.owner_type = validated_data.get('owner_type', instance.owner_type)
-        instance.owner_id = validated_data.get('owner_id', instance.owner_id)
-        instance.gmt_create = validated_data.get('gmt_create', instance.gmt_create)
-        instance.save()
-        return instance
+class PlatformProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlatformProduct
+        fields = ('platform_id', 'product_name', 'repay_type', 'interest_rate')
+
 
 class UserSerializer(serializers.Serializer):
     def create(self, validated_data):
@@ -117,23 +112,27 @@ class ConfigSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('name', 'content', 'gmt_create', 'gmt_modified')
 
 
+class AccountTypeSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = AccountType
+        fields = ('name', 'owner_id', 'gmt_create')
 
-class AccountSerializer(CommonSerializer):
-    account_name = serializers.CharField(max_length=32)
-    platform = serializers.CharField(max_length=20)
-    platform_id = serializers.IntegerField()
-    account_type = serializers.CharField(max_length=10)
-    balance = serializers.FloatField()
-    usage = serializers.CharField(max_length=20)
-    gmt_start = serializers.DateField()
-    cycle = serializers.IntegerField()
-    gmt_end = serializers.DateField()
-    return_rate = serializers.FloatField()
-    memo = serializers.CharField(max_length=100)
-    status = serializers.CharField(max_length=1)
+class AccountSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        pass
+    class Meta:
+        model = Account
+        fields = ('account_id', 'account_name', 'user_id', 'platform', 'account_type', 'balance', 'usage', 'gmt_start', 'cycle', 'gmt_end', 'return_rate', 'memo')
 
-    def update(self, instance, validated_data):
-        pass
+
+class AccountSubSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AccountSub
+        fields = ('account_id', 'account_name', 'user_id', 'product_id', 'memo', 'balance', 'return_rate', 'redeem_type', 'gmt_start', 'gmt_end', 'status', 'gmt_create', 'gmt_modified')
+
+
+class AccountDepositSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AccountDeposit
+        fields = ('account_id', 'user_id', 'sub_id', 'account_type', 'deposit_type', 'gmt_create', 'gmt_modified', 'day', 'amount', 'base', 'deposit_rate')
+

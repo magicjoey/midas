@@ -8,45 +8,54 @@
             <div class="modal-dialog">
                 <div class="modal-content" style="overflow:hidden;">
                     <div class="modal-header">
-                        {% if is_deposit == "Y" %}
-                            新增定存户
-                        {% else %}
-                            新增账户
-                        {% endif %}
+                        新增子账户
                         <button type="button" class="close" aria-hidden="true">×</button>
                         <h4 class="modal-title"></h4></div>
                     <div class="modal-body">
-
-                        {% if is_deposit == "Y" %}
+                        {% if account.platform_id == -1 %}
                             <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
-                                  data-parsley-validate action="/api/account/">
-
-                                <input type="hidden" name="is_deposit" value="{{ is_deposit }}"/>
-                                <input type="hidden" name="platform" value="-1"/>
+                                  data-parsley-validate action="/api/account_sub/">
+                                <input type="hidden" name="is_deposit" value="Y"/>
+                                <input type="hidden" name="account_id" value="{{ account.account_id }}"/>
 
                                 <div class="form-group"><label
-                                        class="col-lg-2 control-label">账户名</label>
+                                        class="col-lg-2 control-label">主账户名</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               value="{{ account.account_name }}"
+                                               disabled readonly/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">子账户名</label>
 
                                     <div class="col-lg-10">
                                         <input type="text"
                                                class="form-control"
                                                name="account_name"
-                                               placeholder="请输入账户名" parsley-required="true"/>
+                                               placeholder="请输入子账户名" parsley-required="true"/>
                                     </div>
                                 </div>
-                                <div class="form-group"><label for="inputName"
-                                                               class="col-lg-2 control-label">账户类型</label>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">起止时间</label>
 
-                                    <div class="col-lg-7">
-                                        <select name="account_type" class="form-control"
-                                                type="select" parsley-required="true" id="account_type_select">
-                                            {% for acct_type in acct_type_list %}
+                                    <input type="hidden"
+                                           class="form-control"
+                                           name="gmt_start"
+                                           id="gmt_start_inp" value="2017/01/01" parsley-required="true"/>
+                                    <input type="hidden"
+                                           class="form-control"
+                                           name="gmt_end"
+                                           id="gmt_end_inp" value="2017/12/31" parsley-required="true"/>
 
-                                                <option value="{{ acct_type.id }}">
-                                                    {{ acct_type.name }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
+                                    {#                                </div>#}
+                                    <div class="col-lg-10">
+                                        <div id="reportrange"
+                                             style="background: #97D4BB; color:#FFF; cursor: pointer; padding: 7px 10px; display:inline-block">
+                                            <i class="fa fa-calendar"></i> <span></span></div>
                                     </div>
                                 </div>
                                 <div class="form-group"><label
@@ -57,17 +66,61 @@
                                         <input type="text"
                                                class="form-control"
                                                name="balance"
-                                               placeholder="请输入余额" parsley-required="true"/>
+                                               placeholder="请输入金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">定存周期</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="deposit_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            <option value="M">
+                                                每月
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group"><label
-                                        class="col-lg-2 control-label">用途</label>
+                                        class="col-lg-2 control-label">定存日期</label>
 
                                     <div class="col-lg-10">
                                         <input type="text"
                                                class="form-control"
-                                               name="usage"
-                                               placeholder="请输入用途" parsley-required="true"/>
+                                               name="day" id="day_inp"
+                                               placeholder="请输入定存日期" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">定存基数</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="base" id="base_inp"
+                                               placeholder="请输入定存基数" />
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">比例%(个人+公司)</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="deposit_rate" id="deposit_rate_inp"
+                                               placeholder="请输入定存比例"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">定存金额</label>
+
+                                    <div class="col-lg-10">
+
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount" id="amount_inp"
+                                               placeholder="请输入新增金额" parsley-required="true"/>
                                     </div>
                                 </div>
                                 <div class="form-group"><label
@@ -88,62 +141,74 @@
                             </form>
                         {% else %}
                             <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
-                                  data-parsley-validate action="/api/account/">
+                                  data-parsley-validate action="/api/account_sub/">
 
-                                <input type="hidden" name="mode" value="{{ account.id }}"/>
+                                <input type="hidden" name="account_id" value="{{ account.account_id }}"/>
 
                                 <div class="form-group"><label
-                                        class="col-lg-2 control-label">账户名</label>
+                                        class="col-lg-2 control-label">主账户名</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               value="{{ account.account_name }}"
+                                               disabled readonly/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">子账户名</label>
 
                                     <div class="col-lg-10">
                                         <input type="text"
                                                class="form-control"
                                                name="account_name"
-                                               placeholder="请输入账户名" parsley-required="true"/>
+                                               placeholder="请输入子账户名" parsley-required="true"/>
                                     </div>
                                 </div>
                                 <div class="form-group"><label
-                                        class="col-lg-2 control-label">平台</label>
+                                        class="col-lg-2 control-label">平台产品</label>
 
                                     <div class="col-lg-7">
-                                        <select name="platform" class="form-control"
-                                                type="select" parsley-required="true" id="platform_select">
-                                            {% for platform in platform_list %}
+                                        <select name="platform_product" class="form-control"
+                                                type="select" parsley-required="true" id="platform_product_select">
+                                            {% for platform_product in platform_product_list %}
 
-                                                <option value="{{ platform.platform_id }}">
-                                                    {{ platform.platform_name }}
+                                                <option value="{{ platform_product.product_id }}">
+                                                    {{ platform_product.product_name }}
                                                 </option>
                                             {% endfor %}
                                         </select>
                                     </div>
                                     <div class="col-lg-3">
-                                        <button class="pull-right btn btn-primary" id="addPlatform" type="button">
-                                            <i class="glyphicon glyphicon-plus"></i><span>新增平台</span></button>
+                                        <button class="pull-right btn btn-primary" id="addPlatformProduct" type="button"
+                                                data-src="{{ account.platform.platform_id }}">
+                                            <i class="glyphicon glyphicon-plus"></i><span>新增产品</span></button>
                                     </div>
                                 </div>
                                 <div class="form-group"><label for="inputName"
-                                                               class="col-lg-2 control-label">账户类型</label>
+                                                               class="col-lg-2 control-label">定期活期</label>
 
                                     <div class="col-lg-7">
-                                        <select name="account_type" class="form-control"
+                                        <select name="redeem_type" class="form-control"
                                                 type="select" parsley-required="true" id="account_type_select">
-                                            {% for acct_type in acct_type_list %}
-
-                                                <option value="{{ acct_type.id }}">
-                                                    {{ acct_type.name }}
-                                                </option>
-                                            {% endfor %}
+                                            <option value="R">定期</option>
+                                            <option value="C">活期</option>
                                         </select>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <button class="pull-right btn btn-success" id="addAccountType" type="button">
-                                            <i class="glyphicon glyphicon-plus"></i><span>新增类型</span></button>
+
+                                        {#                                    <div class="col-sm-4 ios-switch areo">#}
+                                        {#                                        <div class="switch has-switch ios checked">#}
+                                        {#                                            <div class="switch-on switch-animate"><input type="checkbox"><span#}
+                                        {#                                                    class="switch-left"></span><label class="normal">&nbsp;</label><span#}
+                                        {#                                                    class="switch-right"></span></div>#}
+                                        {#                                        </div>#}
+                                        {##}
+                                        {#                                    </div>#}
                                     </div>
                                 </div>
                                 <div class="form-group"><label
                                         class="col-lg-2 control-label">起止时间</label>
 
-                                    {#                                <div class="col-lg-10">#}
                                     <input type="hidden"
                                            class="form-control"
                                            name="gmt_start"
@@ -171,36 +236,6 @@
                                                placeholder="请输入金额" parsley-required="true"/>
                                     </div>
                                 </div>
-                                <div class="form-group"><label
-                                        class="col-lg-2 control-label">用途</label>
-
-                                    <div class="col-lg-10">
-                                        <input type="text"
-                                               class="form-control"
-                                               name="usage"
-                                               placeholder="请输入用途" parsley-required="true"/>
-                                    </div>
-                                </div>
-                                <div class="form-group"><label
-                                        class="col-lg-2 control-label">周期</label>
-
-                                    <div class="col-lg-10">
-                                        <input type="text"
-                                               class="form-control"
-                                               name="cycle" id="cycle_inp"
-                                               placeholder="请输入周期(天)" parsley-required="true"/>
-                                    </div>
-                                </div>
-                                {#                            <div class="form-group"><label#}
-                                {#                                    class="col-lg-2 control-label">结束</label>#}
-
-                                {#                                <div class="col-lg-10">#}
-                                {#                                    <input type="text"#}
-                                {#                                           class="form-control"#}
-                                {#                                           name="gmt_end"#}
-                                {#                                           placeholder="请输入结束时间" parsley-required="true"/>#}
-                                {#                                </div>#}
-                                {#                            </div>#}
                                 <div class="form-group"><label
                                         class="col-lg-2 control-label">收益率</label>
 
@@ -244,18 +279,10 @@
         $("#ajaxModule").remove();
     });
 
-    $("#addAccountType").click(function () {
-        $.ajax({
-            url: '/ajax/add_acct_type/',
-            success: function (e) {
-                $("body").append(e);
-            }
-        })
-    });
 
-    $("#addPlatform").click(function () {
+    $("#addPlatformProduct").click(function () {
         $.ajax({
-            url: '/ajax/add_platform/',
+            url: '/ajax/add_platform_product/?platform_id=' + $(this).attr("data-src"),
             success: function (e) {
                 $("body").append(e);
             }
@@ -272,13 +299,13 @@
         $("#account_type_select option:last").attr({"selected": "selected"});
     };
 
-    var refresh_platform = function (callback_data) {
-        $("#platform_select option").remove();
-        var acct_type_select = $("#platform_select");
+    var refresh_platform_product = function (callback_data) {
+        $("#platform_product_select option").remove();
+        var acct_type_select = $("#platform_product_select");
         for (var index in callback_data) {
-            acct_type_select.append("<option value='" + callback_data[index].pk + "'>" + callback_data[index].platform_name + "</option>");
+            acct_type_select.append("<option value='" + callback_data[index].pk + "'>" + callback_data[index].product_name + "</option>");
         }
-        $("#platform_select option:last").attr({"selected": "selected"});
+        $("#platform_product_select option:last").attr({"selected": "selected"});
     };
 
     $("#ajaxModule form").submit(function (e) {
@@ -346,6 +373,22 @@
     $("#gmt_start_inp").val('2017-01-01');
     $("#gmt_end_inp").val('2017-12-31');
     $("#cycle_inp").val(365);
+
+    var calc_amount = function(rate, base){
+        if(base && rate && !isNaN(base) && !isNaN(rate)){
+            $("#amount_inp").val(Math.round(base*rate/100));
+        }
+    };
+
+    $("#base_inp").change(function(){
+        calc_amount($("#deposit_rate_inp").val(), $(this).val())
+    });
+
+
+
+    $("#deposit_rate_inp").change(function(){
+        calc_amount($(this).val(), $("#base_inp").val())
+    });
 
 
 </script>

@@ -12,10 +12,14 @@ from django.conf.urls import url
 from api import views
 
 urlpatterns = [
-    url(r'^platforms/', views.platforms),
+    url(r'^platform/', views.platform),
+    url(r'^platform_product/', views.platform_product),
     url(r'^login/', views.login),
     url(r'^register/', views.register),
     url(r'^invests/', views.invests),
     url(r'^reminders/', views.reminders),
     url(r'^sms/', views.sms),
+    url(r'^account/', views.account),
+    url(r'^account_sub/', views.account_sub),
+    url(r'^acct_type/', views.acct_type)
 ]
