@@ -1,5 +1,8 @@
+from apscheduler.scheduler import Scheduler
 from django.db import models
 from django.utils import timezone
+from django.core.mail import send_mail
+from spider.bank_maintain_task import crawl
 
 
 class AccountCard(models.Model):
@@ -299,3 +302,49 @@ class RateParam(models.Model):
     half_minute = models.IntegerField()
     five_minutes = models.IntegerField()
     one_day = models.IntegerField()
+
+
+sched = Scheduler()
+
+
+# @sched.interval_schedule(seconds=100)
+def bank_notify_crawl():
+    html = """
+    <iframe class="oD0" frameborder="0" src="read/readhtml.jsp?mid=78:1tbiTguAS1hgxkskbgAAsx&amp;font=15&amp;color=138144" style="height: 454px;" onload="$S('readFraLd')('read.ReadModule_1', this);">
+	<div style="background:#efefef;padding:10px;clear:both;margin-top:15px;height:112px;border-top:1px solid #dedede;border-bottom:1px solid #dedede;">
+<div style="float:left;width:380px;">
+<p style="font-size:20px;color:#ec8a1b;"><a href="" target="_blank">公告标题</a></p>
+<p style="font-size:15px;margin-top:10px;font-weight:bold;">This is just some intro copy. It can be changed to whatever really.</p>
+<p style="margin-top:6px;">Suspendisse potenti. Fusce eu ante in sapien vestibulum sagittis. Cras purus. Nunc rhoncus.</p>
+</div>
+</div>
+
+<div style="margin:10px;clear:both;margin-top:15px;padding-bottom:10px;border-bottom:1px dashed #cccccc;">
+<p><span style="padding:2px 4px 2px 4px;font-size:13px;color:#ffffff;background:#666666;"><b>Lorem ipsum dolar sit orci met</b></span></p>
+<p style="margin-top:8px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in dui ac ante hendrerit commodo et in urna.
+<br /><br />Fusce tincidunt nisl eu magna scelerisque mattis. Ut nunc odio, lobortis id euismod at, viverra nec nunc. Aliquam erat volutpat. Nulla facilisi. Nunc at purus id lacus tempor congue.</p>
+<p style="margin-top:10px;"><a href="http://www.cssMoban.com/" style="color:#ec8a1b;text-decoration:underline;">Read more</a></p>
+</div>
+</iframe>
+"""
+    result = send_mail('银行渠道维护公告-爬虫', 'wc', 'dragonsmaug@126.com',
+                               ['1306164951@qq.com'], fail_silently=False, html_message=html)
+    if 1 == 1:
+        return
+    data = crawl()
+    # 发送邮件
+    # if data is not None and len(data.get("ABC")) != 0:
+    for key in data.keys():
+        for single in data.get(key):
+            content = "链接:" + single['url'] + ",标题:" + single['title'] + ",发布日期:" + single[
+                'release-date'] + ",\n详情如下:\n\n" + single['content']
+            # message1 = (
+            # '银行渠道维护公告-爬虫', "FUCK", 'dragonsmaug@126.com', ['1306164951@qq.com', 'zhengchuan@weibopay.com'])
+            # message2 = ('Another Subject', 'Here is another message', 'from@example.com', ['second@test.com'])
+            #     result = send_mass_mail(message1, fail_silently=False)
+            result = send_mail('银行渠道维护公告-爬虫', content, 'dragonsmaug@126.com',
+                               ['1306164951@qq.com', '475583762@qq.com', '841035336@qq.com'], fail_silently=False, html_message='')
+            print(result)
+
+
+# sched.start()

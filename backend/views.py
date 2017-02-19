@@ -5,6 +5,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from api.models import Account, AccountType, AccountSub, AccountDeposit
 import meta
+from spider.bank_maintain_task import crawl
 
 
 @api_view(['GET', 'POST'])

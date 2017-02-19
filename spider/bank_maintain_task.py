@@ -9,6 +9,7 @@
     @version: 2016-12-25 11:06,bank_maintain_task V1.0 
 """
 import datetime
+# from apscheduler.scheduler import Scheduler
 from django.core.mail import send_mail
 from pyquery import PyQuery as pyq
 
@@ -30,11 +31,8 @@ def crawl(from_date=None):
     maintain_list['SPDB'] = crawl_spdb(from_date)
     maintain_list['GDB'] = crawl_gdb(from_date)
 
-
-
     #平安银行没找到公告地址
-# maintain_list['SZPAB'] = crawl_szpab(from_date)
-
+    # maintain_list['SZPAB'] = crawl_szpab(from_date)
 
     # maintain_list['HCCB'] = crawl_hccb(from_date)
     #暂时交易量<100/天
@@ -42,8 +40,9 @@ def crawl(from_date=None):
     # maintain_list['BCCB'] = crawl_bccb(from_date)
     # maintain_list['CZB'] = crawl_czb(from_date)
     # maintain_list['HKBCHINA'] = crawl_hkbchina(from_date)
-
     return maintain_list
+
+# sched.start()
 
 
 def need_notify(title, release_date, from_date, bank=None):

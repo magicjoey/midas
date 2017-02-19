@@ -99,7 +99,7 @@ EMAIL_USE_TLS = False
 EMAIL_HOST = 'smtp.126.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'dragonsmaug@126.com'
-EMAIL_HOST_PASSWORD = 'wq11235813'
+EMAIL_HOST_PASSWORD = 'wq1123581321'
 DEFAULT_FROM_EMAIL = '巨龙史矛革<dragonsmaug@126.com>'
 
 
