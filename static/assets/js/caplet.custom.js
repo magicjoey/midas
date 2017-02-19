@@ -570,7 +570,7 @@
 			forceParse: 0,
 			showMeridian: 2,
 			//minView: 2,
-			format: "dd MM yyyy"
+			format: "yyyy-mm-dd"
 		});
 		
 		//////////     DATE TIME RANG      //////////

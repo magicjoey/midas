@@ -20,30 +20,13 @@ class AccountCard(models.Model):
         db_table = 'tb_account_card'
 
 
-class AccountFlow(models.Model):
-    user_id = models.IntegerField(blank=True, null=True)
-    account_id = models.IntegerField(blank=True, null=True)
-    amount = models.FloatField()
-    before_balance = models.FloatField(blank=True, null=True)
-    after_balance = models.FloatField(blank=True, null=True)
-    operate_type = models.CharField(max_length=10, blank=True, null=True)
-    direction = models.CharField(max_length=1, blank=True, null=True)
-    memo = models.CharField(max_length=100, blank=True, null=True)
-    gmt_create = models.DateTimeField(blank=True, null=True)
-    gmt_update = models.DateTimeField(blank=True, null=True)
-    trade_name = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'tb_account_flow'
-
-
 class AccountType(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=32, blank=False, null=False)
     is_deposit = models.CharField(max_length=1, blank=False, null=False)
     owner_id = models.IntegerField(blank=True, null=True)
     gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    type = models.CharField(max_length=32, blank=False, null=False)
 
     class Meta:
         managed = False
@@ -185,6 +168,28 @@ class AccountSub(models.Model):
     class Meta:
         managed = False
         db_table = 'tb_account_sub'
+
+
+class AccountFlow(models.Model):
+    user_id = models.IntegerField(blank=True, null=True)
+    account_id = models.ForeignKey(Account, max_length=12, on_delete=models.DO_NOTHING,
+                                     verbose_name="账户",
+                                     db_column="account_id", related_name='account_fk')
+    amount = models.FloatField()
+    before_balance = models.FloatField(blank=True, null=True)
+    after_balance = models.FloatField(blank=True, null=True)
+    operate_type = models.CharField(max_length=10, blank=True, null=True)
+    direction = models.CharField(max_length=1, blank=True, null=True)
+    memo = models.CharField(max_length=100, blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    gmt_update = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    trade_name = models.CharField(max_length=100, blank=True, null=True)
+    label = models.CharField(max_length=128, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tb_account_flow'
+
 
 
 class AccountDeposit(models.Model):

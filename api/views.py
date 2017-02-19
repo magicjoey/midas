@@ -3,20 +3,17 @@ import json
 import random
 from string import Template
 from django.contrib.auth.hashers import make_password, check_password
-from django.core import serializers
-from django.shortcuts import render
-
-# Create your views here.
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
-from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from api.models import Platform, User, SmsRecord, SmsTemplate, Config, AccountType, PlatformProduct, Account, AccountSub
+from api.models import Platform, User, SmsRecord, SmsTemplate, Config, AccountType, PlatformProduct, Account, \
+    AccountSub, \
+    AccountFlow
 from api.serialzers import PlatformSerializer, UserSerializer, RegisterSerializer, LoginSerializer, \
     LoginResponseSerializer, SmsRequestSerializer, SmsTemplateSerializer, ConfigSerializer, AccountSerializer, \
-    AccountTypeSerializer, PlatformProductSerializer, AccountSubSerializer, AccountDepositSerializer
-from api.throttle import SmsRateThrottle
-from api.util import build_response
+    AccountTypeSerializer, PlatformProductSerializer, AccountSubSerializer, AccountDepositSerializer, \
+    AccountingSerializer, AccountFlowSerializer
 import meta
 
 
@@ -189,13 +186,13 @@ def account(request, format=None):
     if serializer.is_valid():
         serializer.save()
         # if request.data['is_deposit'] == "Y":
-            # account = Account.objects.get(user_id=meta.get_user_id(request), account_type_id=param_dict['account_type'])
-            # param_dict['account_id'] = account.account_id
-            # dp_serializer = AccountDepositSerializer(data=param_dict)
-            # if dp_serializer.is_valid():
-            #     dp_serializer.save()
-            # else:
-            # return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+        # account = Account.objects.get(user_id=meta.get_user_id(request), account_type_id=param_dict['account_type'])
+        # param_dict['account_id'] = account.account_id
+        # dp_serializer = AccountDepositSerializer(data=param_dict)
+        # if dp_serializer.is_valid():
+        #     dp_serializer.save()
+        # else:
+        # return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
         return Response({"code": "S", "msg": "更新成功"}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
@@ -216,7 +213,8 @@ def account_sub(request, format=None):
         account.balance += serializer.data['balance']
         account.save()
         if request.POST.get('is_deposit') == "Y":
-            account_sub_list = AccountSub.objects.filter(user_id=meta.get_user_id(request), account_id=param_dict['account_id']).order_by("-gmt_create")
+            account_sub_list = AccountSub.objects.filter(user_id=meta.get_user_id(request),
+                                                         account_id=param_dict['account_id']).order_by("-gmt_create")
             param_dict['sub_id'] = account_sub_list[0].id
             dp_serializer = AccountDepositSerializer(data=param_dict)
             if dp_serializer.is_valid():
@@ -285,3 +283,77 @@ def acct_type(request):
             return Response({"code": "F", "msg": "删除失败"}, status.HTTP_400_BAD_REQUEST)
         acct_types = meta.to_json(AccountType.objects.filter(owner_id__in=[-1, meta.get_user_id(request)]))
         return Response({"code": "S", "msg": "更新成功", "account_types": acct_types}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', 'POST', "DELETE"])
+def accounting(request):
+    """
+    通用记账接口：
+    ---
+    request_serializer: AccountingSerializer
+    """
+    if request.method == "POST":
+        # 判断待收款账户类型是否存在
+        serializer = AccountingSerializer(data=request.data)
+        if serializer.is_valid():
+            income_account = None
+            if serializer.data['accounting_type'] in ["receivables"]:
+                try:
+                    raw_sql = "select * from tb_account ac where ac.user_id=%s and exists(select 1 from tb_account_type a where a.id=ac.account_type and a.type=%s)"
+                    account_list = Account.objects.raw(raw_sql,
+                                                       [meta.get_user_id(request), serializer.data['accounting_type']])
+                    assert len(list(account_list)) != 0, "账户不能为空"
+                    account = account_list[0]
+                except AssertionError:
+                    # 新建账户
+                    account_type = AccountType.objects.get(type=serializer.data['accounting_type'], owner_id=-1)
+                    account = Account(account_name=account_type.name, user_id=meta.get_user_id(request),
+                                      platform_id=serializer.data['platform'],
+                                      account_type_id=account_type.id, balance=0, usage=account_type.name,
+                                      gmt_start=datetime.now(),
+                                      memo=account_type.name)
+                    account.save()
+            elif serializer.data['accounting_type'] in ["payout", "income"]:
+                account = Account.objects.get(account_id=serializer.data['account'], user_id=meta.get_user_id(request))
+            elif serializer.data['accounting_type'] in ["transfer"]:
+                account = Account.objects.get(account_id=serializer.data['account'], user_id=meta.get_user_id(request))
+                income_account = Account.objects.get(account_id=serializer.data['income_account'],
+                                                     user_id=meta.get_user_id(request))
+            flow_serial = AccountFlowSerializer(
+                __accounting(serializer, account, meta.get_user_id(request), income_account))
+            return Response({"code": "S", "msg": "保存成功", "flow": flow_serial.data}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
+
+def __accounting(accounting, account, user_id, income_account=None):
+    after_balance = meta.calc_after_amount(accounting.data['accounting_type'], account.balance,
+                                           accounting.data['amount'], False)
+    flow = AccountFlow(user_id=user_id, account_id_id=account.account_id, amount=accounting.data['amount'],
+                       before_balance=account.balance,
+                       after_balance=after_balance,
+                       operate_type=accounting.data['accounting_type'],
+                       direction=meta.get_direction(accounting.data['accounting_type'], False),
+                       memo=accounting.data['memo'],
+                       label=accounting.data['label'])
+    account.balance = after_balance
+    account.gmt_modified = timezone.now()
+    account.save()
+    flow.save()
+
+    #转账的收款账户
+    if accounting.data['accounting_type'] in ["transfer"] and income_account is not None:
+        after_balance2 = meta.calc_after_amount(accounting.data['accounting_type'], income_account.balance,
+                                                accounting.data['amount'], True)
+        flow2 = AccountFlow(user_id=user_id, account_id_id=income_account.account_id, amount=accounting.data['amount'],
+                            before_balance=income_account.balance,
+                            after_balance=after_balance2,
+                            operate_type=accounting.data['accounting_type'],
+                            direction=meta.get_direction(accounting.data['accounting_type'], True),
+                            memo=accounting.data['memo'],
+                            label=accounting.data['label'])
+        income_account.balance = after_balance2
+        income_account.gmt_modified = timezone.now()
+        income_account.save()
+        flow2.save()
+
+    return flow

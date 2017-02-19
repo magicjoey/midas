@@ -21,5 +21,7 @@ urlpatterns = [
     url(r'^sms/', views.sms),
     url(r'^account/', views.account),
     url(r'^account_sub/', views.account_sub),
-    url(r'^acct_type/', views.acct_type)
+    url(r'^acct_type/', views.acct_type),
+    url(r'^accounting/', views.accounting),
+
 ]

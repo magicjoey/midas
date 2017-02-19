@@ -40,46 +40,35 @@
                            id="toggle-column">
                         <thead>
                         <tr>
-                            <th>账户编号</th>
+                            <th>流水编号</th>
                             <th>账户名</th>
                             <th>平台</th>
                             <th>账户类型</th>
-                            <th>金额(余)</th>
-                            <th>用途</th>
-                            <th>开始</th>
-                            <th>周期(天)</th>
-                            <th>结束</th>
-                            <th>收益率</th>
+                            <th>前余额</th>
+                            <th>金额</th>
+                            <th>后余额</th>
+                            <th>操作类型</th>
+                            <th>方向</th>
                             <th>备注</th>
-                            <th>状态</th>
-                            <th>操作</th>
+                            <th>交易名</th>
+                            <th>时间</th>
                         </tr>
                         </thead>
                         <tbody align="left">
-                        {% for account in account_list %}
+                        {% for account_flow in account_flow_list %}
                             <tr class="odd gradeX">
-                                <td>{{ account.account_id }}</td>
-                                <td><a href="/account_sub/?account_id={{ account.account_id }}"
-                                       target="_blank">{{ account.account_name }}</a></td>
-                                <td>{{ account.platform.platform_name }}</td>
-                                <td>{{ account.account_type.name }}</td>
-                                <td>¥{{ account.balance }}</td>
-                                <td>{{ account.usage }}</td>
-                                <td>{{ account.gmt_start }}</td>
-                                <td>{{ account.cycle }}</td>
-                                <td>{{ account.gmt_end }}</td>
-                                <td>{{ account.return_rate }}</td>
-                                <td>{{ account.memo }}</td>
-                                <td>{{ account.status.name }}</td>
-                                <td class="center">
-                                    <a href="javascript:ajax_del('<?=$menu->menu_id?>')" class="ajaxDel"
-                                       id="<?=$menu->menu_id?>"><span class="table-button glyphicon glyphicon-trash"
-                                                                      aria-hidden="true"></span></a>
-                                    &nbsp;&nbsp;
-                                    <a href="javascript:ajaxEdit('<?=$menu->menu_id?>')" class="ajaxEdit"
-                                       id="<?=$menu->menu_id?>"><span class="table-button glyphicon glyphicon-cog"
-                                                                      aria-hidden="true"></span></a>
-                                </td>
+                                <td>{{ account_flow.id }}</td>
+                                <td>{{ account_flow.account_id.account_name }}</td>
+                                <td>{{ account_flow.account_id.platform.platform_name }}</td>
+                                <td>{{ account_flow.account_id.account_type.name }}</td>
+                                <td>¥{{ account_flow.before_balance }}</td>
+                                <td>¥{{ account_flow.amount }}</td>
+                                <td>¥{{ account_flow.after_balance }}</td>
+                                <td>{{ account_flow.operate_type }}</td>
+                                <td>{{ account_flow.direction }}</td>
+                                <td>{{ account_flow.memo }}</td>
+                                <td>{{ account_flow.trade_name }}</td>
+                                <td>{{ account_flow.gmt_create }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

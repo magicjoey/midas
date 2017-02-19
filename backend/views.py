@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.decorators import api_view
-from api.models import Account, AccountType, AccountSub, AccountDeposit
+from api.models import Account, AccountType, AccountSub, AccountDeposit, Platform, AccountFlow
 import meta
 from spider.bank_maintain_task import crawl
 
@@ -67,7 +67,12 @@ def account(request):
 
 
 def accounting(request):
-    return render(request, "backend/nav_page/accounting.html", {})
+    account_type_list = AccountType.objects.filter(owner_id__in=[meta.get_user_id(request), -1])
+    platform_list = Platform.objects.filter(owner_id__in=[-1, meta.get_user_id(request)])
+    account_list = Account.objects.filter(user_id=meta.get_user_id(request)).order_by("-account_id")
+    return render(request, "backend/nav_page/accounting.html",
+                  {"account_type_list": account_type_list, "platform_list": platform_list,
+                   "account_list": account_list})
 
 
 def account_sub(request):
@@ -91,13 +96,20 @@ def account_type(request):
     return render(request, "backend/nav_page/account_type.html", {"account_type_list": account_type_list})
 
 
-def finance(request):
-    return render(request, "backend/nav_page/finance.html", {})
+def account_flow(request):
+    account_flow_list = AccountFlow.objects.filter(user_id=meta.get_user_id(request))
+    return render(request, "backend/nav_page/account_flow.html", {"account_flow_list": account_flow_list})
 
 
 def donate(request):
     # todo 捐赠
     pass
+
+
+def gold(request):
+    # https://forexdata.wallstreetcn.com/kline?prod_code=XAUUSD&candle_period=5&data_count=80&end_time=0&fields=close_px
+    # https://forexdata.wallstreetcn.com/real?en_prod_code=XAUUSD&fields=prod_name,last_px,px_change,px_change_rate,price_precision,securities_type
+    return render(request, "backend/nav_page/gold.html", {})
 
 
 def profile(request):
