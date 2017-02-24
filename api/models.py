@@ -1,4 +1,9 @@
-from apscheduler.scheduler import Scheduler
+import datetime
+import json
+
+import requests
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
 from django.db import models
 from django.utils import timezone
 from django.core.mail import send_mail
@@ -173,8 +178,11 @@ class AccountSub(models.Model):
 class AccountFlow(models.Model):
     user_id = models.IntegerField(blank=True, null=True)
     account_id = models.ForeignKey(Account, max_length=12, on_delete=models.DO_NOTHING,
-                                     verbose_name="账户",
-                                     db_column="account_id", related_name='account_fk')
+                                   verbose_name="账户",
+                                   db_column="account_id", related_name='account_fk')
+    sub_id = models.ForeignKey(AccountSub, max_length=12, on_delete=models.DO_NOTHING,
+                               verbose_name="子账户",
+                               db_column="sub_id", related_name='sub_account_fk')
     amount = models.FloatField()
     before_balance = models.FloatField(blank=True, null=True)
     after_balance = models.FloatField(blank=True, null=True)
@@ -185,11 +193,11 @@ class AccountFlow(models.Model):
     gmt_update = models.DateTimeField(blank=True, null=True, default=timezone.now())
     trade_name = models.CharField(max_length=100, blank=True, null=True)
     label = models.CharField(max_length=128, blank=True, null=True)
+    gmt_occur = models.DateTimeField(blank=True, null=True, default=timezone.now())
 
     class Meta:
         managed = False
         db_table = 'tb_account_flow'
-
 
 
 class AccountDeposit(models.Model):
@@ -309,47 +317,78 @@ class RateParam(models.Model):
     one_day = models.IntegerField()
 
 
-sched = Scheduler()
+class BankMaintain(models.Model):
+    url = models.CharField(max_length=128, blank=True, null=True)
+    title = models.CharField(max_length=128, blank=True, null=True)
+    release_date = models.CharField(max_length=128, blank=True, null=True)
+    full_title = models.CharField(max_length=256, blank=True, null=True)
+    content = models.CharField(max_length=5000, blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
+
+    class Meta:
+        managed = False
+        db_table = 'tb_bank_maintain'
 
 
-# @sched.interval_schedule(seconds=100)
+class Gold(models.Model):
+    type = models.CharField(max_length=10, blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    gmt_create = models.DateTimeField(blank=True, null=True, default=timezone.now())
+    max_price = models.FloatField(blank=True, null=True)
+    min_price = models.FloatField(blank=True, null=True)
+    yes_price = models.FloatField(blank=True, null=True)
+    open_price = models.FloatField(blank=True, null=True)
+    total_vol = models.FloatField(blank=True, null=True)
+    limit = models.CharField(max_length=32, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tb_gold'  # @sched.interval_schedule(seconds=100)
+
+
 def bank_notify_crawl():
-    html = """
-    <iframe class="oD0" frameborder="0" src="read/readhtml.jsp?mid=78:1tbiTguAS1hgxkskbgAAsx&amp;font=15&amp;color=138144" style="height: 454px;" onload="$S('readFraLd')('read.ReadModule_1', this);">
-	<div style="background:#efefef;padding:10px;clear:both;margin-top:15px;height:112px;border-top:1px solid #dedede;border-bottom:1px solid #dedede;">
-<div style="float:left;width:380px;">
-<p style="font-size:20px;color:#ec8a1b;"><a href="" target="_blank">公告标题</a></p>
-<p style="font-size:15px;margin-top:10px;font-weight:bold;">This is just some intro copy. It can be changed to whatever really.</p>
-<p style="margin-top:6px;">Suspendisse potenti. Fusce eu ante in sapien vestibulum sagittis. Cras purus. Nunc rhoncus.</p>
-</div>
-</div>
-
-<div style="margin:10px;clear:both;margin-top:15px;padding-bottom:10px;border-bottom:1px dashed #cccccc;">
-<p><span style="padding:2px 4px 2px 4px;font-size:13px;color:#ffffff;background:#666666;"><b>Lorem ipsum dolar sit orci met</b></span></p>
-<p style="margin-top:8px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in dui ac ante hendrerit commodo et in urna.
-<br /><br />Fusce tincidunt nisl eu magna scelerisque mattis. Ut nunc odio, lobortis id euismod at, viverra nec nunc. Aliquam erat volutpat. Nulla facilisi. Nunc at purus id lacus tempor congue.</p>
-<p style="margin-top:10px;"><a href="http://www.cssMoban.com/" style="color:#ec8a1b;text-decoration:underline;">Read more</a></p>
-</div>
-</iframe>
-"""
-    result = send_mail('银行渠道维护公告-爬虫', 'wc', 'dragonsmaug@126.com',
-                               ['1306164951@qq.com'], fail_silently=False, html_message=html)
-    if 1 == 1:
-        return
     data = crawl()
     # 发送邮件
-    # if data is not None and len(data.get("ABC")) != 0:
+    content = ""
     for key in data.keys():
         for single in data.get(key):
-            content = "链接:" + single['url'] + ",标题:" + single['title'] + ",发布日期:" + single[
-                'release-date'] + ",\n详情如下:\n\n" + single['content']
-            # message1 = (
-            # '银行渠道维护公告-爬虫', "FUCK", 'dragonsmaug@126.com', ['1306164951@qq.com', 'zhengchuan@weibopay.com'])
-            # message2 = ('Another Subject', 'Here is another message', 'from@example.com', ['second@test.com'])
-            #     result = send_mass_mail(message1, fail_silently=False)
-            result = send_mail('银行渠道维护公告-爬虫', content, 'dragonsmaug@126.com',
-                               ['1306164951@qq.com', '475583762@qq.com', '841035336@qq.com'], fail_silently=False, html_message='')
-            print(result)
+            try:
+                bank_maintain = BankMaintain.objects.get(url=single['url'], full_title=single['full-title'])
+            except BankMaintain.DoesNotExist:
+                bank_maintain = BankMaintain(url=single['url'], title=single['title'],
+                                             full_title=single['full-title'], content=single['content'],
+                                             release_date=single['release-date'])
+                bank_maintain.save()
+            if (timezone.now() - bank_maintain.gmt_create).days > 7:
+                continue
+            content += "\n\n链接:" + single['url'] + "\n,标题:" + single['title'] + ",发布日期:" + single[
+                'release-date'] + ",\n详情如下:\n" + single['content']
+    result = send_mail('银行渠道维护公告-爬虫', content, 'dragonsmaug@126.com',
+                       ['1306164951@qq.com', '475583762@qq.com', '841035336@qq.com'], fail_silently=False,
+                       html_message='')
 
 
-# sched.start()
+# 黄金同步
+def gold_sync():
+    url = "http://web.juhe.cn:8080/finance/gold/shgold?v=&key=5465b4584fbdc8155b2693ae9fee2ac0"
+    resp = requests.get(url, timeout=3, verify=False)
+    result = json.loads(resp.content.decode())
+    if result['error_code'] == 0:
+        for entry in result['result']:
+            for key in entry:
+                if entry[key]['variety'] == "Au100g":
+                    current_time = datetime.datetime.strptime(entry[key]['time'],'%Y-%m-%d %H:%M:%S')
+                    gold = Gold(type="GOLD", time=current_time, price=float(entry[key]['latestpri'])
+                                , max_price=float(entry[key]['maxpri']), min_price=float(entry[key]['minpri']),
+                                yes_price=float(entry[key]['yespri']),
+                                open_price=float(entry[key]['openpri']),
+                                total_vol=float(entry[key]['totalvol']), limit=entry[key]['limit'])
+                    gold.save()
+    return resp
+
+
+sched = BackgroundScheduler()
+sched.add_job(bank_notify_crawl, 'cron', second='0', minute='40', hour='9', )
+sched.add_job(gold_sync, 'cron', minute='*/5')
+sched.start()

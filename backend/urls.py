@@ -33,5 +33,8 @@ urlpatterns = [
     url(r'my_cc/', views.my_cc),
     url(r'cc_list/', views.cc_list),
     url(r'cc_marketing/', views.cc_marketing),
+    url(r'account_add_flow/', views.account_add_flow),
+    url(r'account_edit/', views.account_edit),
+    url(r'account_flow_list/', views.account_flow_list),
     url(r'ajax/', include("backend.ajax_urls"))
     ]

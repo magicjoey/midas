@@ -7,23 +7,30 @@ from api.models import User, Account, AccountFlow, Invest, Reminder, Platform, P
 class UserAdmin(admin.ModelAdmin):
     list_display = []
 
+
 class AccountAdmin(admin.ModelAdmin):
     list_display = []
+
 
 class AccountFlowAdmin(admin.ModelAdmin):
     list_display = []
 
+
 class InvestAdmin(admin.ModelAdmin):
     list_display = []
+
 
 class ReminderAdmin(admin.ModelAdmin):
     list_display = []
 
+
 class PlatformAdmin(admin.ModelAdmin):
     list_display = []
 
+
 class PlatformProductAdmin(admin.ModelAdmin):
     list_display = []
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Account, AccountAdmin)

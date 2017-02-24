@@ -4,19 +4,40 @@
 {% block css %}{% endblock %}
 {% block content %}
     <div class="col-lg-12">
-        <section class="panel">
-            <header class="panel-heading">
-                <h2><strong>{{ account.account_name }}</strong></h2>
-                <label class="color">子账户 <em><strong> </strong></em></label>
+        <form>
+            <section class="panel">
+                <header class="panel-heading">
+                    <h2><strong>{{ account.account_name }}</strong></h2>
+                    <label class="color">子账户 <em><strong> </strong></em></label>
 
-                <button class="pull-right btn btn-success" id="addAccountSub" type="button"  data-src="{{ account.account_id }}">
-                    <i class="glyphicon glyphicon-plus"></i><span>新增子账户</span></button>
+                    <button class="pull-right btn btn-success" id="addAccountSub" type="button"
+                            data-src="{{ account.account_id }}">
+                        <i class="glyphicon glyphicon-plus"></i><span>新增子账户</span></button>
 
-                <table cellpadding="0" cellspacing="0" border="0"
+                    <ul>
+                        <li>
+                            <button class="pull-left btn btn-default ml5 open_window" type="button"
+                                    data-url="/account_edit/">
+                                <i class="glyphicon glyphicon-edit"></i><span>账户编辑</span></button>
+                        </li>
+                        <li>
+                            <button class="pull-left btn btn-default  ml5 open_window" type="button"
+                                    data-url="/account_add_flow/">
+                                <i class="glyphicon glyphicon-plus"></i><span>账户记账</span></button>
+                        </li>
+                        <li>
+                            <button class="pull-left btn btn-default ml5 open_window" type="button"
+                                    data-url="/account_flow_list/">
+                                <i class="glyphicon glyphicon-th-list"></i><span>账务明细</span></button>
+                        </li>
+                    </ul>
+
+                    <table cellpadding="0" cellspacing="0" border="0"
                            class="table table-striped table-hover"
                            id="toggle-column">
                         <thead>
                         <tr>
+                            <th>选中</th>
                             <th>账户编号</th>
                             <th>账户名</th>
                             <th>平台</th>
@@ -33,95 +54,115 @@
                         </tr>
                         </thead>
                         <tbody align="left">
-                            <tr class="odd gradeX">
-                                <td>{{ account.account_id }}</td>
-                                <td>{{ account.account_name }}</td>
-                                <td>{{ account.platform.platform_name }}</td>
-                                <td>{{ account.account_type.name }}</td>
-                                <td>¥{{ account.balance }}</td>
-                                <td>{{ account.usage }}</td>
-                                <td>{{ account.gmt_start }}</td>
-                                <td>{{ account.cycle }}</td>
-                                <td>{{ account.gmt_end }}</td>
-                                <td>{{ account.return_rate }}</td>
-                                <td>{{ account.memo }}</td>
-                                <td>{{ account.status.name }}</td>
-                                <td class="center">
-                                    <a href="javascript:ajax_del('<?=$menu->menu_id?>')" class="ajaxDel"
-                                       id="<?=$menu->menu_id?>"><span class="table-button glyphicon glyphicon-trash"
-                                                                      aria-hidden="true"></span></a>
-                                    &nbsp;&nbsp;
-                                    <a href="javascript:ajaxEdit('<?=$menu->menu_id?>')" class="ajaxEdit"
-                                       id="<?=$menu->menu_id?>"><span class="table-button glyphicon glyphicon-cog"
-                                                                      aria-hidden="true"></span></a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-
-            </header>
-            <div class="panel-tools fully color " align="right" data-toolscolor="theme-inverse">
-                <ul class="tooltip-area">
-                    <li>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default dropdown-toggle"
-                                    data-toggle="dropdown" data-table="table-toggle-column"
-                                    data-table-target="#toggle-column" title="Table Column"><i
-                                    class="fa fa-th-list"></i></button>
-                            <ul class="dropdown-menu arrow pull-right" role="menu"></ul>
-                        </div>
-                    </li>
-                    <li><a href="javascript:void(0)" class="btn btn-collapse" title="Collapse"><i
-                            class="fa fa-sort-amount-asc"></i></a></li>
-                    <li><a href="javascript:void(0)" class="btn btn-reload" title="Reload"><i
-                            class="fa fa-retweet"></i></a></li>
-                    <li><a href="javascript:void(0)" class="btn btn-close" title="Close"><i
-                            class="fa fa-times"></i></a></li>
-                </ul>
-            </div>
-            <div class="panel-body">
-                <form>
-                    <table cellpadding="0" cellspacing="0" border="0"
-                           class="table table-striped table-hover" data-provide="data-table"
-                           id="toggle-column">
-                        <thead>
-                        <tr>
-                            <th>选项</th>
-                            <th>账户编号</th>
-                            <th>账户名</th>
-                            <th>金额(余)</th>
-                            <th>赎回类型</th>
-                            <th>开始</th>
-                            <th>结束</th>
-                            <th>收益率</th>
-                            <th>备注</th>
-                            <th>状态</th>
+                        <tr class="odd gradeX">
+                            <td>
+                                <ul class="iCheck" data-style="square" data-color="green" style="margin-top: -10px;">
+                                    <li>
+                                        <input type="radio" name="account-radio"
+                                               data-src="main-{{ account.account_id }}">
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>{{ account.account_id }}</td>
+                            <td>{{ account.account_name }}</td>
+                            <td>{{ account.platform.platform_name }}</td>
+                            <td>{{ account.account_type.name }}</td>
+                            <td>¥{{ account.balance }}</td>
+                            <td>{{ account.usage }}</td>
+                            <td>{{ account.gmt_start }}</td>
+                            <td>{{ account.cycle }}</td>
+                            <td>{{ account.gmt_end }}</td>
+                            <td>{{ account.return_rate }}</td>
+                            <td>{{ account.memo }}</td>
+                            <td>{{ account.status.name }}</td>
+                            <td class="center">
+                                <a href="javascript:ajax_del('<?=$menu->menu_id?>')" class="ajaxDel"
+                                   id="<?=$menu->menu_id?>"><span class="table-button glyphicon glyphicon-trash"
+                                                                  aria-hidden="true"></span></a>
+                                &nbsp;&nbsp;
+                                <a href="javascript:ajaxEdit('<?=$menu->menu_id?>')" class="ajaxEdit"
+                                   id="<?=$menu->menu_id?>"><span class="table-button glyphicon glyphicon-cog"
+                                                                  aria-hidden="true"></span></a>
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody align="left">
-                        {% for account_sub in account_sub_list %}
-                            <tr class="odd gradeX">
-                                <td><input type="radio" data-src="{{ account_sub.id }}" class="checklist"/></td>
-                                <td>{{ account_sub.id }}</td>
-                                <td>{{ account_sub.account_name }}</td>
-                                <td>¥{{ account_sub.balance }}</td>
-                                <td>{{ account_sub.redeem_type }}</td>
-                                <td>{{ account_sub.gmt_start }}</td>
-                                <td>{{ account_sub.gmt_end }}</td>
-                                <td>{{ account_sub.return_rate }}</td>
-                                <td>{{ account_sub.memo }}</td>
-                                <td>{{ account_sub.status }}</td>
-                            </tr>
-                        {% endfor %}
                         </tbody>
                     </table>
-                </form>
-            </div>
-{#            <div class="panel-body">#}
-{#                无信息#}
-{#            </div>#}
-        </section>
+
+
+                </header>
+                <div class="panel-tools fully color " align="right" data-toolscolor="theme-inverse">
+                    <ul class="tooltip-area">
+                        <li>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle"
+                                        data-toggle="dropdown" data-table="table-toggle-column"
+                                        data-table-target="#toggle-column" title="Table Column"><i
+                                        class="fa fa-th-list"></i></button>
+                                <ul class="dropdown-menu arrow pull-right" role="menu"></ul>
+                            </div>
+                        </li>
+                        <li><a href="javascript:void(0)" class="btn btn-collapse" title="Collapse"><i
+                                class="fa fa-sort-amount-asc"></i></a></li>
+                        <li><a href="javascript:void(0)" class="btn btn-reload" title="Reload"><i
+                                class="fa fa-retweet"></i></a></li>
+                        <li><a href="javascript:void(0)" class="btn btn-close" title="Close"><i
+                                class="fa fa-times"></i></a></li>
+                    </ul>
+                </div>
+
+                {% if account_sub_list|length > 0 %}
+                    <div class="panel-body">
+
+                        <table cellpadding="0" cellspacing="0" border="0"
+                               class="table table-striped table-hover" data-provide="data-table"
+                               id="toggle-column">
+                            <thead>
+                            <tr>
+                                <th>选项</th>
+                                <th>账户编号</th>
+                                <th>账户名</th>
+                                <th>金额(余)</th>
+                                <th>赎回类型</th>
+                                <th>开始</th>
+                                <th>结束</th>
+                                <th>收益率</th>
+                                <th>备注</th>
+                                <th>状态</th>
+                            </tr>
+                            </thead>
+                            <tbody align="left">
+                            {% for account_sub in account_sub_list %}
+                                <tr class="odd gradeX">
+                                    <td>
+                                        <ul class="iCheck" data-style="square" data-color="green"
+                                            style="margin-top: -10px;">
+                                            <li>
+                                                <input type="radio" name="account-radio"
+                                                       data-src="sub-{{ account_sub.id }}">
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td>{{ account_sub.id }}</td>
+                                    <td>{{ account_sub.account_name }}</td>
+                                    <td>¥{{ account_sub.balance }}</td>
+                                    <td>{{ account_sub.redeem_type }}</td>
+                                    <td>{{ account_sub.gmt_start }}</td>
+                                    <td>{{ account_sub.gmt_end }}</td>
+                                    <td>{{ account_sub.return_rate }}</td>
+                                    <td>{{ account_sub.memo }}</td>
+                                    <td>{{ account_sub.status }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                {% endif %}
+                {#            <div class="panel-body">#}
+                {#                无信息#}
+                {#            </div>#}
+            </section>
+        </form>
 
     </div>
 {% endblock %}
@@ -130,10 +171,23 @@
     <script type="text/javascript" src="{% static "assets/plugins/datable/dataTables.bootstrap.js" %}"></script>
 
     <script>
+
+        $(".open_window").click(function(){
+            var checked_ele = $("input[name=account-radio]:checked").attr("data-src");
+            if(!checked_ele){
+               alert("未选中任何记录！");
+                return;
+            }
+            var arr = checked_ele.split("-");
+            var url = $(this).attr("data-url")+"?account_type="+ arr[0]+"&account_id="+arr[1];
+            open_window(url);
+
+        });
+
         $("#addAccountSub").click(function () {
 
             $.ajax({
-                url: '/ajax/add_acct_sub/?account_id='+$(this).attr("data-src"),
+                url: '/ajax/add_acct_sub/?account_id=' + $(this).attr("data-src"),
                 success: function (e) {
                     $("body").append(e);
                 }

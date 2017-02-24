@@ -5,6 +5,6 @@ django-rest-swagger
 django-celery==3.1.17
 scrapy
 pyquery
-apscheduler==2.1.2
+apscheduler==3.0.3
 redis==2.10.3
 gunicorn==19.3.0

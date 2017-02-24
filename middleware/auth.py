@@ -8,13 +8,15 @@
     @description:
     @version: 2017-01-29 10:19,logincheck V1.0 
 """
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from rest_framework import status
 from rest_framework.response import Response
 
 need_not_login_urls = ['/api/login/', '/api/logout/', '/api/register', '/api/recover/', '/login/', '/register/','/recover/']
 
+
 class AuthCheckMiddleware(object):
+
     def process_request(self, request):
         url = request.path
         for single_nlurl in need_not_login_urls:
@@ -26,7 +28,7 @@ class AuthCheckMiddleware(object):
             if url.find("/api/") == 0:
                 return Response({"code": "F", "msg": e}, status=status.HTTP_200_OK)
             else:
-                return HttpResponse(e)
+                return HttpResponseRedirect("/login/")
         return None
 
     def process_response(self, request, response):

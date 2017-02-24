@@ -166,5 +166,5 @@ class AccountFlowSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountFlow
         fields = (
-        'user_id', 'account_id', 'amount', 'before_balance', 'after_balance', 'operate_type', 'direction', 'memo',
-        'gmt_create', 'gmt_update', 'trade_name', 'label')
+        'user_id', 'account_id', 'sub_id', 'amount', 'before_balance', 'after_balance', 'operate_type', 'direction', 'memo',
+        'gmt_create', 'gmt_update', 'trade_name', 'label', 'gmt_occur')

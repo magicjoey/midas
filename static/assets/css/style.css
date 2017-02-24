@@ -10519,3 +10519,8 @@ div.col5 {
 #account_fund_chart tr th:nth-child(10), #account_fund_chart tr td:nth-child(10) {
     color: #3db9af;
 }
+
+
+.ml5{
+    margin-left:5px;
+}

@@ -148,3 +148,55 @@ def cc_marketing(request):
 
 def cc_list(request):
     pass
+
+
+def account_add_flow(request):
+    account_type = request.GET.get("account_type")
+    account_id = request.GET.get("account_id")
+    user_id = meta.get_user_id(request)
+    account_name = ""
+
+    if "main" == account_type:
+        account = Account.objects.get(account_id=account_id, user_id=user_id)
+        account_name = account.account_name
+    elif "sub" == account_type:
+        account_sub = AccountSub.objects.get(id=account_id, user_id=user_id)
+        account_name = account_sub.account_name
+    else:
+        raise ValueError("不支持的账户类型")
+    return render(request, "backend/full_page/account_add_flow.html",
+                  {"account_name": account_name, "account_id": account_id,
+                   "account_type": account_type})
+
+
+def account_flow_list(request):
+    account_type = request.GET.get("account_type")
+    account_id = request.GET.get("account_id")
+    user_id = meta.get_user_id(request)
+
+    if "main" == account_type:
+        account_flow_list = AccountFlow.objects.filter(account_id=account_id, user_id=user_id)
+    elif "sub" == account_type:
+        account_flow_list = AccountFlow.objects.filter(sub_id=account_id, user_id=user_id)
+    else:
+        raise ValueError("不支持的账户类型")
+
+    return render(request, "backend/full_page/account_flow_list.html", {"account_flow_list": account_flow_list})
+
+
+def account_edit(request):
+    account_type = request.GET.get("account_type")
+    account_id = request.GET.get("account_id")
+    user_id = meta.get_user_id(request)
+    acct_type_list = AccountType.objects.filter(owner_id__in=[-1, meta.get_user_id(request)]).order_by("owner_id", "id")
+    platform_list = Platform.objects.filter(owner_id__in=[-1, meta.get_user_id(request)]).order_by("owner_id",
+                                                                                                   "platform_id")
+
+    if "main" == account_type:
+        account = Account.objects.get(account_id=account_id, user_id=user_id)
+        return render(request, "backend/full_page/account_edit.html", {"account": account, "acct_type_list":acct_type_list, "platform_list":platform_list})
+    elif "sub" == account_type:
+        account_sub = AccountSub.objects.get(id=account_id, user_id=user_id)
+        return render(request, "backend/full_page/account_edit_sub.html", {"account_sub": account_sub, "acct_type_list":acct_type_list, "platform_list":platform_list})
+    else:
+        raise ValueError("不支持的账户类型")
