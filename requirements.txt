@@ -8,3 +8,4 @@ pyquery
 apscheduler==3.0.3
 redis==2.10.3
 gunicorn==19.3.0
+requests==2.6.0
