@@ -12,7 +12,7 @@ from django.http import HttpResponseRedirect
 from rest_framework import status
 from rest_framework.response import Response
 
-need_not_login_urls = ['/api/login/', '/api/logout/', '/api/register', '/api/recover/', '/login/', '/register/','/recover/']
+need_not_login_urls = ['/api/login/', '/api/logout/', '/api/register', '/api/recover/', '/login/', '/register/','/recover/', '/static/']
 
 
 class AuthCheckMiddleware(object):
