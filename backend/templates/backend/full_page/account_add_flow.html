@@ -1,0 +1,766 @@
+{% extends "backend/common/nav_common.html" %}
+{% load staticfiles %}
+{% block title %}Midas-记账{% endblock %}
+{% block css %}{% endblock %}
+{% block content %}
+    <div class="col-lg-12">
+        <section class="panel">
+            <header class="panel-heading">
+                <h2><strong>记账</strong></h2>
+                <label class="color">记账 <em><strong> </strong></em></label>
+            </header>
+            <div class="panel-body">
+                <div class="tabbable">
+                    <ul id="profile-tab" class="nav nav-tabs" data-provide="tabdrop">
+                        <li><a href="#" id="prevtab" data-change="prev"><i class="fa fa-chevron-left"></i></a></li>
+                        <li><a href="#" id="nexttab" class="change" data-change="next"><i
+                                class="fa fa-chevron-right"></i></a></li>
+                        <li class="active"><a href="#tab1" data-toggle="tab">支出</a></li>
+                        <li><a href="#tab2" data-toggle="tab" class="timeline-show">收入</a></li>
+                        <li><a href="#tab3" data-toggle="tab" class="portfolio-show">转账</a></li>
+                        {#                        <li><a href="#tab4" data-toggle="tab">报销</a></li>#}
+                        {#                        <li><a href="#tab5" data-toggle="tab">投资</a></li>#}
+                        {% if user_type == "VIP" %}
+                            <li><a href="#tab6" data-toggle="tab">套现</a></li>
+                        {% endif %}
+                        {#                        <li><a href="#tab7" data-toggle="tab">回款</a></li>#}
+                        <li><a href="#tab8" data-toggle="tab">应收款</a></li>
+                    </ul>
+                    <div class="tab-content row">
+
+                        <div class="tab-pane fade in active col-lg-8" id="tab1">
+                            <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
+                                  data-parsley-validate action="/api/accounting/">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="accounting_type" value="payout"/>
+
+
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出账户</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="account" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select" >
+                                            {% for account in account_list %}
+                                                <option value="{{ account.account_id }}" {% if account_id == account.account_id %}selected{% endif %}>{{ account.account_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">支出金额</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount"
+                                               placeholder="请输入支出金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">发生时间</label>
+
+
+                                    <div class="input-group date form_datetime col-lg-10"
+                                         data-picker-position="bottom-left" data-date-format="yyyy-MM-dd">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="gmt_occur"
+                                               placeholder="请输入发生时间" parsley-required="true"/>
+                                        <span class="input-group-btn">
+																								<button class="btn btn-default"
+                                                                                                        type="button"><i
+                                                                                                        class="fa fa-times"></i></button>
+																								<button class="btn btn-default"
+                                                                                                        type="button"><i
+                                                                                                        class="fa fa-calendar"></i></button>
+																								</span>
+
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">标签</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               data-role="tagsinput"
+                                               placeholder="请输入标签" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">备注</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="memo"
+                                               placeholder="请输入备注" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default closeBtn">关闭</button>
+                                    <button class="btn btn-primary btn btn-success" type="submit">保存</button>
+                                </div>
+                            </form>
+
+                            <br>
+                        </div>
+                        <!-- /#tab1-->
+
+
+                        <div class="tab-pane fade col-lg-8" id="tab2">
+                            <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
+                                  data-parsley-validate action="/api/accounting/">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="accounting_type" value="income"/>
+
+
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">收入账户</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="account" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            {% for account in account_list %}
+                                                <option value="{{ account.account_id }}" {% if account_id == account.account_id %}selected{% endif %}>{{ account.account_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">收入金额</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount"
+                                               placeholder="请输入收入金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">发生时间</label>
+
+
+                                    <div class="input-group date form_datetime col-lg-10"
+                                         data-picker-position="bottom-left" data-date-format="yyyy-MM-dd">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="gmt_occur"
+                                               placeholder="请输入发生时间" parsley-required="true"/>
+                                        <span class="input-group-btn">
+																								<button class="btn btn-default"
+                                                                                                        type="button"><i
+                                                                                                        class="fa fa-times"></i></button>
+																								<button class="btn btn-default"
+                                                                                                        type="button"><i
+                                                                                                        class="fa fa-calendar"></i></button>
+																								</span>
+
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">标签</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               data-role="tagsinput"
+                                               placeholder="请输入标签" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">备注</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="memo"
+                                               placeholder="请输入备注" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default closeBtn">关闭</button>
+                                    <button class="btn btn-primary btn btn-success" type="submit">保存</button>
+                                </div>
+                            </form>
+
+                        </div>
+                        <!-- /#tab2-->
+
+
+                        <div class="tab-pane fade col-lg-8" id="tab3">
+                            <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
+                                  data-parsley-validate action="/api/accounting/">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="accounting_type" value="transfer"/>
+
+
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出账户</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="account" class="form-control"
+                                                type="select" parsley-required="true" id="account_select">
+                                            {% for account in account_list %}
+                                                <option value="{{ account.account_id }}" {% if account_id == account.account_id %}selected{% endif %}>{{ account.account_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">收入账户</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="income_account" class="form-control"
+                                                type="select" parsley-required="true" id="income_account_select">
+                                            {% for account in account_list %}
+                                                <option value="{{ account.account_id }}">{{ account.account_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">发生金额</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount"
+                                               placeholder="请输入发生金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">发生时间</label>
+
+
+                                    <div class="input-group date form_datetime col-lg-10"
+                                         data-picker-position="bottom-left" data-date-format="yyyy-MM-dd">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="gmt_occur"
+                                               placeholder="请输入发生时间" parsley-required="true"/>
+                                        <span class="input-group-btn">
+																								<button class="btn btn-default"
+                                                                                                        type="button"><i
+                                                                                                        class="fa fa-times"></i></button>
+																								<button class="btn btn-default"
+                                                                                                        type="button"><i
+                                                                                                        class="fa fa-calendar"></i></button>
+																								</span>
+
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">标签</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               data-role="tagsinput"
+                                               placeholder="请输入标签" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">备注</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="memo"
+                                               placeholder="请输入备注" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default closeBtn">关闭</button>
+                                    <button class="btn btn-primary btn btn-success" type="submit">保存</button>
+                                </div>
+                            </form>
+
+                        </div>
+                        <!-- /#tab3-->
+
+
+                        <div class="tab-pane fade col-lg-8" id="tab4">
+                            <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
+                                  data-parsley-validate action="/api/accounting/">
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">支出金额</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount"
+                                               placeholder="请输入支出金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出分类</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="account_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            {% for acct_type in acct_type_list %}
+
+                                                <option value="{{ acct_type.id }}">
+                                                    {{ acct_type.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">时间</label>
+
+                                    <div class="col-lg-10">
+
+                                        <input type="text"
+                                               class="form-control"
+                                               name="balance"
+                                               placeholder="请输入余额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出账户</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="deposit_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            <option value="M">
+                                                每月
+                                            </option>
+                                            <option value="H">
+                                                每半月
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">标签</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               data-role="tagsinput"
+                                               placeholder="请输入标签" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">备注</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="memo"
+                                               placeholder="请输入备注" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default closeBtn">关闭</button>
+                                    <button class="btn btn-primary btn btn-success" type="submit">保存</button>
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <div class="tab-pane fade col-lg-8" id="tab5">
+                            <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
+                                  data-parsley-validate action="/api/accounting/">
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">支出金额</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount"
+                                               placeholder="请输入支出金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出分类</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="account_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            {% for acct_type in acct_type_list %}
+
+                                                <option value="{{ acct_type.id }}">
+                                                    {{ acct_type.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">时间</label>
+
+                                    <div class="col-lg-10">
+
+                                        <input type="text"
+                                               class="form-control"
+                                               name="balance"
+                                               placeholder="请输入余额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出账户</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="deposit_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            <option value="M">
+                                                每月
+                                            </option>
+                                            <option value="H">
+                                                每半月
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">标签</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               data-role="tagsinput"
+                                               placeholder="请输入标签" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">备注</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="memo"
+                                               placeholder="请输入备注" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default closeBtn">关闭</button>
+                                    <button class="btn btn-primary btn btn-success" type="submit">保存</button>
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <div class="tab-pane fade col-lg-8" id="tab6">
+                            <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
+                                  data-parsley-validate action="/api/accounting/">
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">支出金额</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount"
+                                               placeholder="请输入支出金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出分类</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="account_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            {% for acct_type in acct_type_list %}
+
+                                                <option value="{{ acct_type.id }}">
+                                                    {{ acct_type.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">时间</label>
+
+                                    <div class="col-lg-10">
+
+                                        <input type="text"
+                                               class="form-control"
+                                               name="balance"
+                                               placeholder="请输入余额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出账户</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="deposit_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            <option value="M">
+                                                每月
+                                            </option>
+                                            <option value="H">
+                                                每半月
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">标签</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               data-role="tagsinput"
+                                               placeholder="请输入标签" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">备注</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="memo"
+                                               placeholder="请输入备注" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default closeBtn">关闭</button>
+                                    <button class="btn btn-primary btn btn-success" type="submit">保存</button>
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <div class="tab-pane fade col-lg-8" id="tab7">
+                            <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
+                                  data-parsley-validate action="/api/accounting/">
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">支出金额</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount"
+                                               placeholder="请输入支出金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出分类</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="account_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            {% for acct_type in acct_type_list %}
+
+                                                <option value="{{ acct_type.id }}">
+                                                    {{ acct_type.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">时间</label>
+
+                                    <div class="col-lg-10">
+
+                                        <input type="text"
+                                               class="form-control"
+                                               name="balance"
+                                               placeholder="请输入余额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">支出账户</label>
+
+                                    <div class="col-lg-7">
+                                        <select name="deposit_type" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            <option value="M">
+                                                每月
+                                            </option>
+                                            <option value="H">
+                                                每半月
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">标签</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               data-role="tagsinput"
+                                               placeholder="请输入标签" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">备注</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="memo"
+                                               placeholder="请输入备注" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default closeBtn">关闭</button>
+                                    <button class="btn btn-primary btn btn-success" type="submit">保存</button>
+                                </div>
+                            </form>
+
+                        </div>
+
+
+                        <div class="tab-pane fade col-lg-8" id="tab8">
+                            <form class="form-horizontal" method="post" id="formAjaxId" data-collabel="3"
+                                  data-parsley-validate action="/api/accounting/">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="accounting_type" value="receivables"/>
+
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">应收款金额</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="amount"
+                                               placeholder="请输入应收款金额" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label for="inputName"
+                                                               class="col-lg-2 control-label">应付款方</label>
+                                    <div class="col-lg-7">
+                                        <select name="platform" class="form-control"
+                                                type="select" parsley-required="true" id="account_type_select">
+                                            {% for platform in platform_list %}
+
+                                                <option value="{{ platform.platform_id }}"
+                                                        {% if platform.platform_name == "匿名" %}
+                                                        selected="selected"
+                                                        {% endif %}
+                                                >
+                                                    {{ platform.platform_name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">截止时间</label>
+
+
+                                    <div class="input-group date form_datetime col-lg-10"
+                                         data-picker-position="bottom-left" data-date-format="yyyy-MM-dd">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="gmt_end"
+                                               placeholder="请输入截止时间" parsley-required="true"/>
+                                        <span class="input-group-btn">
+																								<button class="btn btn-default"
+                                                                                                        type="button"><i
+                                                                                                        class="fa fa-times"></i></button>
+																								<button class="btn btn-default"
+                                                                                                        type="button"><i
+                                                                                                        class="fa fa-calendar"></i></button>
+																								</span>
+
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">标签</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="label"
+                                               data-role="tagsinput"
+                                               placeholder="请输入标签" parsley-required="true"/>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label
+                                        class="col-lg-2 control-label">备注</label>
+
+                                    <div class="col-lg-10">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="memo"
+                                               placeholder="请输入备注" parsley-required="true"/>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default closeBtn">关闭</button>
+                                    <button class="btn btn-primary btn btn-success" type="submit">保存</button>
+                                </div>
+                            </form>
+
+                        </div>
+
+                    </div>
+                    <!-- //tab-content -->
+                </div>
+
+
+            </div>
+            {#            <div class="panel-body">#}
+            {#                无信息#}
+            {#            </div>#}
+        </section>
+
+    </div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="{% static "assets/plugins/datable/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/plugins/datable/dataTables.bootstrap.js" %}"></script>
+
+    <script>
+        $("#addAccount").click(function () {
+            $.ajax({
+                url: '/ajax/add_acct/',
+                success: function (e) {
+                    $("body").append(e);
+                }
+            })
+        });
+
+        $("form").submit(function (e) {
+            e.preventDefault();
+            if (!$(this).parsley('validate')) {
+//            e.preventDefault();
+            } else {
+                $.ajax({
+                    url: $(this).attr("action"),
+                    type: "post",
+                    data: $(this).serialize(),
+                    success: function (e) {
+                        $("#loading-top span").text("添加成功...")
+                    }
+                })
+            }
+        });
+    </script>
+{% endblock %}

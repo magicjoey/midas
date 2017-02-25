@@ -1,0 +1,143 @@
+{% extends "backend/common/nav_common.html" %}
+{% load staticfiles %}
+{% block title %}Midas-信用卡{% endblock %}
+{% block css %}{% endblock %}
+{% block content %}
+
+				<div class="tabbable">
+						<ul class="nav nav-tabs" data-provide="tabdrop">
+								<li><a href="#" id="prevtab" data-change="prev"><i class="fa fa-chevron-left"></i></a></li>
+								<li><a href="#" id="nexttab" class="change" data-change="next"><i class="fa fa-chevron-right"></i></a></li>
+								<li class="active"><a href="#tab1" data-toggle="tab">刷卡活动</a></li>
+								<li><a href="#tab2" data-toggle="tab">海淘活动</a></li>
+								<li><a href="#tab3" data-toggle="tab">开卡活动</a></li>
+						</ul>
+						<div class="tab-content">
+
+								<div class="tab-pane fade in active" id="tab1">
+									<div>
+											<div class="btn-group pull-right">
+													<button class="btn btn-inverse active"><i class="fa fa-bars"></i></button>
+													<button class="btn btn-inverse"><i class="fa fa-th"></i></button>
+											</div>
+											<h2><strong>ALL</strong> 33 Albums</h2>
+									</div>
+									<hr>
+									<div class="row row-clear gallery-albums">
+											<div class="col-sm-3">
+													<h3>Working On</h3>
+													<label  class="color">15 Photo, 05 Dec 2103</label>
+													<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+													<button class="btn btn-theme-inverse">Open Albums</button>
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/1.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/2.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/3.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="clearfix"></div>
+											<hr>
+											<div class="col-sm-3">
+													<h3>The eyes have it</h3>
+													<label  class="color"> 81 Photo, 27 Sep 2103</label>
+													<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+													<button class="btn btn-theme-inverse">Open Albums</button>
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/4.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/5.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="clearfix"></div>
+											<hr>
+											<div class="col-sm-3">
+													<h3>Pimelea plants of Australia</h3>
+													<label  class="color"> 54 Photo, 26 Sep 2103</label>
+													<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+													<button class="btn btn-theme-inverse">Open Albums</button>
+											</div>
+											<div class="col-sm-3">
+													<img  src="assets/photos_preview/thumbs/6.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/7.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/8.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="clearfix"></div>
+											<hr>
+											<div class="col-sm-3">
+													<h3>The eyes have it</h3>
+													<label  class="color"> 81 Photo, 27 Sep 2103</label>
+													<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+													<button class="btn btn-theme-inverse">Open Albums</button>
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/9.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="clearfix"></div>
+											<hr>
+											<div class="col-sm-3">
+													<h3>Pimelea plants of Australia</h3>
+													<label  class="color"> 54 Photo, 26 Sep 2103</label>
+													<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+													<button class="btn btn-theme-inverse">Open Albums</button>
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/10.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="col-sm-3">
+													<img src="assets/photos_preview/thumbs/11.jpg" class="img-preview" alt="Preview">
+											</div>
+											<div class="clearfix"></div>
+											<hr>
+											<div class="pull-right">
+													<button class="btn btn-theme disabled">Newer</button>
+													<button class="btn  btn-theme">Older</button>
+											</div>
+									</div>
+								</div>
+								<!-- //tab1 -->
+
+								<div class="tab-pane fade" id="tab2">
+										<div>
+												<div class="btn-group pull-right">
+														<button class="btn btn-inverse active"><i class="fa fa-th"></i></button>
+														<button class="btn btn-inverse" id="fullScreen"><i class="fa fa-laptop"></i></button>
+												</div>
+												<h2><strong>1,845</strong>  Photo.</h2>
+										</div>
+										<hr>
+										<div id="gallery-content">
+												<div id="canvas_loading"></div>
+												<div id="gallery"></div>
+										</div>
+								</div>
+								<!-- //tab2 -->
+
+								<div class="tab-pane fade" id="tab3">
+										<h3>Like Demo Tab</h3>
+										<hr>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+								</div>
+								<!-- //tab3 -->
+						</div>
+						<!-- //tab-content -->
+				</div>
+				<!-- //tabbable -->
+
+{% endblock %}
+{% block js %}
+    <script type="text/javascript" src="{% static "assets/plugins/datable/jquery.dataTables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/plugins/datable/dataTables.bootstrap.js" %}"></script>
+
+    <script>
+
+    </script>
+{% endblock %}

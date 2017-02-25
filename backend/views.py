@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.decorators import api_view
-from api.models import Account, AccountType, AccountSub, AccountDeposit, Platform, AccountFlow
+from api.models import Account, AccountType, AccountSub, AccountDeposit, Platform, AccountFlow, Bank
 import meta
 from spider.bank_maintain_task import crawl
 
@@ -139,7 +139,8 @@ def asset_increase(request):
 
 
 def my_cc(request):
-    return None
+    bank_list = Bank.objects.all()
+    return render(request, "backend/nav_page/my_cc.html", {"bank_list": bank_list})
 
 
 def cc_marketing(request):
@@ -155,6 +156,9 @@ def account_add_flow(request):
     account_id = request.GET.get("account_id")
     user_id = meta.get_user_id(request)
     account_name = ""
+    account_type_list = AccountType.objects.filter(owner_id__in=[meta.get_user_id(request), -1])
+    platform_list = Platform.objects.filter(owner_id__in=[-1, meta.get_user_id(request)])
+    account_list = Account.objects.filter(user_id=meta.get_user_id(request)).order_by("-account_id")
 
     if "main" == account_type:
         account = Account.objects.get(account_id=account_id, user_id=user_id)
@@ -166,7 +170,8 @@ def account_add_flow(request):
         raise ValueError("不支持的账户类型")
     return render(request, "backend/full_page/account_add_flow.html",
                   {"account_name": account_name, "account_id": account_id,
-                   "account_type": account_type})
+                   "account_type": account_type,"account_type_list": account_type_list, "platform_list": platform_list,
+                   "account_list": account_list})
 
 
 def account_flow_list(request):
