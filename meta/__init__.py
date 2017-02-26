@@ -8,6 +8,7 @@
     @description:
     @version: 2017-01-30 11:10,__init__ V1.0 
 """
+import datetime
 import json
 from django.core import serializers
 
@@ -35,7 +36,7 @@ def get_user_id(request):
 def get_direction(trade_type, is_second=False):
     if trade_type in ['payout']:
         return "O"
-    elif trade_type in ['income', 'reimburse', 'receivables']:
+    elif trade_type in ['income', 'reimburse', 'receivables','bonus']:
         return "I"
     elif trade_type in ['transfer', 'invest', 'cashback']:
         if is_second:
@@ -56,3 +57,23 @@ def calc_after_amount(accounting_type, before_amount, amount, is_second=False):
     #         return "I"
     #     else:
     #         return "O"
+
+
+def get_date(days=0):
+    return datetime.date.today() + datetime.timedelta(days=days)
+
+
+def get_today():
+    return get_date()
+
+
+def get_yesterday():
+    return get_date(-1)
+
+
+def get_tomorrow():
+    return get_date(1)
+
+
+if __name__ == '__main__':
+    print(get_yesterday())

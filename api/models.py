@@ -3,10 +3,11 @@ import json
 
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers.blocking import BlockingScheduler
 from django.db import models
 from django.utils import timezone
 from django.core.mail import send_mail
+
+import meta
 from spider.bank_maintain_task import crawl
 
 
@@ -371,24 +372,74 @@ def bank_notify_crawl():
 
 # 黄金同步
 def gold_sync():
-    url = "http://web.juhe.cn:8080/finance/gold/shgold?v=&key=5465b4584fbdc8155b2693ae9fee2ac0"
-    resp = requests.get(url, timeout=3, verify=False)
-    result = json.loads(resp.content.decode())
-    if result['error_code'] == 0:
-        for entry in result['result']:
-            for key in entry:
-                if entry[key]['variety'] == "Au100g":
-                    current_time = datetime.datetime.strptime(entry[key]['time'],'%Y-%m-%d %H:%M:%S')
-                    gold = Gold(type="GOLD", time=current_time, price=float(entry[key]['latestpri'])
-                                , max_price=float(entry[key]['maxpri']), min_price=float(entry[key]['minpri']),
-                                yes_price=float(entry[key]['yespri']),
-                                open_price=float(entry[key]['openpri']),
-                                total_vol=float(entry[key]['totalvol']), limit=entry[key]['limit'])
-                    gold.save()
-    return resp
+    try:
+        url = "http://web.juhe.cn:8080/finance/gold/shgold?v=&key=5465b4584fbdc8155b2693ae9fee2ac0"
+        resp = requests.get(url, timeout=3, verify=False)
+        result = json.loads(resp.content.decode())
+        if result['error_code'] == 0:
+            for entry in result['result']:
+                for key in entry:
+                    if entry[key]['variety'] == "Au100g":
+                        current_time = datetime.datetime.strptime(entry[key]['time'], '%Y-%m-%d %H:%M:%S')
+                        gold = Gold(type="GOLD", time=current_time, price=float(entry[key]['latestpri'])
+                                    , max_price=float(entry[key]['maxpri']), min_price=float(entry[key]['minpri']),
+                                    yes_price=float(entry[key]['yespri']),
+                                    open_price=float(entry[key]['openpri']),
+                                    total_vol=float(entry[key]['totalvol']), limit=entry[key]['limit'])
+                        gold.save()
+        return resp
+    except:
+        pass
 
+def income_distribute():
+    try:
+        account_list = Account.objects.all()
+        account_type = "bonus"
+        for account in account_list:
+            left_amount = account.balance
+            try:
+                account_sub_list = AccountSub.objects.filter(account_id_id=account.account_id)
+                for account_sub in account_sub_list:
+                    if account_sub.return_rate is not None and account_sub.return_rate != 0:
+                        bonus(account.account_id, account_sub.id, account_sub.return_rate * account_sub.balance,
+                              account_sub.user_id, account_type, str(meta.get_yesterday()) + '收益发放', "收益")
+                    left_amount = account.balance - account_sub.balance
+            except AccountSub.DoesNotExist:
+                pass
+            bonus(account.account_id, None, account.return_rate * left_amount,
+                  account.user_id, account_type, str(meta.get_yesterday()) + '收益发放', "收益")
+        print("收益发放结束")
+    except:
+        pass
 
 sched = BackgroundScheduler()
 sched.add_job(bank_notify_crawl, 'cron', second='0', minute='40', hour='9', )
-sched.add_job(gold_sync, 'cron', minute='*/5')
+sched.add_job(income_distribute, 'cron', second='0', minute='0', hour='2', )
+sched.add_job(gold_sync, 'cron', second='0', minute='0', hour='9',)
 sched.start()
+
+
+def bonus(account_id, sub_id, amount, balance, user_id, account_type, memo, label):
+    try:
+        after_balance = meta.calc_after_amount(account_type, balance,
+                                               amount)
+        flow = AccountFlow(user_id=user_id, account_id_id=account_id, sub_id_id=sub_id, amount=amount,
+                           before_balance=balance,
+                           after_balance=after_balance,
+                           operate_type=account_type,
+                           direction=meta.get_direction(account_type, False),
+                           memo=memo,
+                           label=label)
+        if sub_id is None:
+            account = Account.objects.get(account_id=account_id, user_id=user_id)
+            account.balance = after_balance
+            account.gmt_modified = timezone.now()
+            account.save()
+        else:
+            account_sub = AccountSub.objects.get(account_id_id=account_id, id=sub_id, user_id=user_id)
+            account_sub.balance = after_balance
+            account_sub.gmt_modified = timezone.now()
+            account_sub.save()
+        flow.save()
+    except:
+        pass
