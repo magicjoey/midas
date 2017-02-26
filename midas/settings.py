@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'midas',
         'USER': 'root',
         'PASSWORD': 'midas1Fucker2-#3=',
-        'HOST': '127.0.0.1',
+        'HOST': '122.112.218.138',
         'PORT': '3306',
     }
 }
