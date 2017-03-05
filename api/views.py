@@ -13,7 +13,7 @@ from api.models import Platform, User, SmsRecord, SmsTemplate, Config, AccountTy
 from api.serialzers import PlatformSerializer, UserSerializer, RegisterSerializer, LoginSerializer, \
     LoginResponseSerializer, SmsRequestSerializer, SmsTemplateSerializer, ConfigSerializer, AccountSerializer, \
     AccountTypeSerializer, PlatformProductSerializer, AccountSubSerializer, AccountDepositSerializer, \
-    AccountingSerializer, AccountFlowSerializer
+    AccountingSerializer, AccountFlowSerializer, ProfileSerializer, PasswordSerializer
 import meta
 
 
@@ -68,9 +68,46 @@ def login(request):
     return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PUT'])
+@api_view(['POST'])
 def profile(request):
-    pass
+    """
+    个人信息更新接口:
+    ---
+    request_serializer: ProfileSerializer
+    """
+    serializer = ProfileSerializer(data=request.data)
+    if serializer.is_valid():
+        user = User.objects.get(id=meta.get_user_id(request))
+        user.nick_name = serializer.data['nick_name']
+        user.introduction = serializer.data['introduction']
+        user.gmt_update = timezone.now()
+        user.save()
+        login_response = LoginResponseSerializer(user)
+        # 设置 session
+        request.session['login_user'] = login_response.data
+        return Response({"code": "S", "msg": "用户信息更新成功"}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def password(request):
+    """
+    个人密码更新接口:
+    ---
+    request_serializer: PasswordSerializer
+    """
+    serializer = PasswordSerializer(data=request.data)
+    if serializer.is_valid():
+        user = User.objects.get(id=meta.get_user_id(request))
+        is_correct = check_password(serializer.data['orig_password'], user.password)
+        if is_correct:
+            user.password = make_password(serializer.data['password'], '', 'pbkdf2_sha256')
+            user.gmt_update = timezone.now()
+            user.save()
+            return Response({"code": "S", "msg": "用户密码更新成功"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"code": "F", "msg": "原密码不正确"}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -340,7 +377,7 @@ def __accounting(accounting, account, user_id, income_account=None):
     account.save()
     flow.save()
 
-    #转账的收款账户
+    # 转账的收款账户
     if accounting.data['accounting_type'] in ["transfer"] and income_account is not None:
         after_balance2 = meta.calc_after_amount(accounting.data['accounting_type'], income_account.balance,
                                                 accounting.data['amount'], True)

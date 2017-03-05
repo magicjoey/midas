@@ -85,6 +85,28 @@ class LoginResponseSerializer(serializers.HyperlinkedModelSerializer):
                   'introduction', 'sex', 'birthday', 'gmt_login', 'gmt_create', 'gmt_update')
 
 
+class ProfileSerializer(CommonSerializer):
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+    nick_name = fields.CharField()
+    introduction = fields.CharField()
+
+
+class PasswordSerializer(CommonSerializer):
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+    orig_password = fields.CharField()
+    password = fields.CharField()
+
+
 class SmsRequestSerializer(CommonSerializer):
     def create(self, validated_data):
         pass

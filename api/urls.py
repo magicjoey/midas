@@ -23,5 +23,7 @@ urlpatterns = [
     url(r'^account_sub/', views.account_sub),
     url(r'^acct_type/', views.acct_type),
     url(r'^accounting/', views.accounting),
+    url(r'^profile/', views.profile),
+    url(r'^password/', views.password),
 
 ]

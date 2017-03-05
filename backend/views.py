@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.decorators import api_view
-from api.models import Account, AccountType, AccountSub, AccountDeposit, Platform, AccountFlow, Bank
+from api.models import Account, AccountType, AccountSub, AccountDeposit, Platform, AccountFlow, Bank, User
 import meta
 from spider.bank_maintain_task import crawl
 
@@ -113,7 +113,8 @@ def gold(request):
 
 
 def profile(request):
-    return render(request, "backend/nav_page/profile.html", {})
+    user = User.objects.get(id=meta.get_user_id(request))
+    return render(request, "backend/nav_page/profile.html", {"user":user})
 
 
 def password(request):
@@ -141,6 +142,10 @@ def asset_increase(request):
 def my_cc(request):
     bank_list = Bank.objects.all()
     return render(request, "backend/nav_page/my_cc.html", {"bank_list": bank_list})
+
+
+def card_promote(request):
+    return render(request, "backend/nav_page/card_promote.html")
 
 
 def cc_marketing(request):

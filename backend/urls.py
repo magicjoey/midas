@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'profile/', views.profile),
     url(r'password/', views.password),
     url(r'my_cc/', views.my_cc),
+    url(r'card_promote/', views.card_promote),
     url(r'cc_list/', views.cc_list),
     url(r'cc_marketing/', views.cc_marketing),
     url(r'account_add_flow/', views.account_add_flow),
